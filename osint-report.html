@@ -1,0 +1,2722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OSINT Intelligence Report: People Search, Due Diligence &amp; Background Checks</title>
+  <style>
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 15px; }
+    body {
+      font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
+      background: #F7F6F2;
+      color: #28251D;
+      line-height: 1.65;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ===== LAYOUT ===== */
+    #sidebar {
+      width: 230px;
+      min-width: 230px;
+      background: #F9F8F5;
+      border-right: 1px solid #D4D1CA;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 24px 16px;
+      flex-shrink: 0;
+    }
+    #main {
+      flex: 1;
+      max-width: 960px;
+      padding: 40px 48px 60px 48px;
+      overflow-x: hidden;
+    }
+
+    /* ===== SIDEBAR TOC ===== */
+    .toc-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #7A7974;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #D4D1CA;
+    }
+    .toc-list { list-style: none; }
+    .toc-list li { margin-bottom: 2px; }
+    .toc-list a {
+      display: block;
+      padding: 5px 8px;
+      border-radius: 4px;
+      font-size: 0.82rem;
+      color: #28251D;
+      text-decoration: none;
+      transition: background 0.15s;
+      line-height: 1.4;
+    }
+    .toc-list a:hover { background: #EAE9E4; color: #01696F; }
+    .toc-list a.active { background: #E0F2F2; color: #01696F; font-weight: 600; }
+    .toc-num {
+      display: inline-block;
+      width: 18px;
+      font-weight: 700;
+      color: #01696F;
+      font-size: 0.78rem;
+    }
+    .toc-sub { padding-left: 26px; }
+    .toc-sub a { font-size: 0.77rem; color: #7A7974; }
+    .toc-sub a:hover { color: #01696F; }
+    .toc-print-btn {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid #D4D1CA;
+    }
+    .btn-print {
+      display: block;
+      width: 100%;
+      background: #01696F;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 8px 12px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      font-family: inherit;
+      transition: background 0.15s;
+    }
+    .btn-print:hover { background: #015459; }
+
+    /* ===== HEADER ===== */
+    .report-header {
+      background: #01696F;
+      color: white;
+      padding: 36px 40px;
+      border-radius: 8px;
+      margin-bottom: 36px;
+    }
+    .report-header .report-tag {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      opacity: 0.8;
+      margin-bottom: 10px;
+    }
+    .report-header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 10px;
+    }
+    .report-header .subtitle {
+      font-size: 1.05rem;
+      opacity: 0.85;
+      margin-bottom: 14px;
+    }
+    .report-meta {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .report-meta span::before { content: "• "; }
+    .report-meta span:first-child::before { content: ""; }
+    .exec-summary {
+      background: rgba(255,255,255,0.12);
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin-top: 18px;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      opacity: 0.95;
+    }
+
+    /* ===== SECTION STYLES ===== */
+    section { margin-bottom: 52px; }
+    .section-divider {
+      height: 3px;
+      background: linear-gradient(90deg, #01696F 0%, #D4D1CA 100%);
+      border-radius: 2px;
+      margin-bottom: 24px;
+    }
+    h2 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: #01696F;
+      margin-bottom: 6px;
+      padding-top: 4px;
+    }
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #28251D;
+      margin: 24px 0 10px 0;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #D4D1CA;
+    }
+    h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #28251D;
+      margin: 14px 0 6px 0;
+    }
+    p { margin-bottom: 12px; }
+    ul, ol { margin: 10px 0 14px 22px; }
+    li { margin-bottom: 5px; }
+
+    /* ===== TABLES ===== */
+    .table-wrap { overflow-x: auto; margin: 16px 0 24px 0; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+      background: #F9F8F5;
+    }
+    thead th {
+      background: #01696F;
+      color: white;
+      padding: 10px 12px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.82rem;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+    tbody tr:nth-child(odd) { background: #F7F6F2; }
+    tbody tr:nth-child(even) { background: #FBFBF9; }
+    tbody tr:hover { background: #EEF9F9; }
+    td {
+      padding: 9px 12px;
+      border-bottom: 1px solid #E8E6E0;
+      vertical-align: top;
+      line-height: 1.5;
+    }
+    td a { color: #01696F; text-decoration: none; }
+    td a:hover { text-decoration: underline; }
+
+    /* ===== BADGES ===== */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+    .badge-free { background: #437A22; color: white; }
+    .badge-freemium { background: #964219; color: white; }
+    .badge-paid { background: #A13544; color: white; }
+    .badge-na { background: #7A7974; color: white; }
+
+    /* ===== CALLOUT BOXES ===== */
+    .callout-warning {
+      border-left: 4px solid #964219;
+      background: #FFF8F0;
+      padding: 12px 16px;
+      margin: 16px 0;
+      border-radius: 0 6px 6px 0;
+    }
+    .callout-warning .callout-title {
+      font-weight: 700;
+      color: #964219;
+      font-size: 0.88rem;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .callout-tip {
+      border-left: 4px solid #01696F;
+      background: #F0FAFB;
+      padding: 12px 16px;
+      margin: 16px 0;
+      border-radius: 0 6px 6px 0;
+    }
+    .callout-tip .callout-title {
+      font-weight: 700;
+      color: #01696F;
+      font-size: 0.88rem;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .callout-warning p, .callout-tip p { margin-bottom: 0; font-size: 0.9rem; }
+    .callout-warning ul, .callout-tip ul { margin: 6px 0 0 18px; font-size: 0.9rem; }
+    .callout-warning li, .callout-tip li { margin-bottom: 3px; }
+
+    /* ===== TOOL CARDS ===== */
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 20px; margin: 16px 0; }
+    .card {
+      background: #F9F8F5;
+      border: 1px solid #D4D1CA;
+      border-radius: 8px;
+      padding: 20px;
+    }
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #01696F;
+    }
+    .card-subtitle { font-size: 0.8rem; color: #7A7974; margin-top: 2px; }
+    .card-desc { font-size: 0.88rem; margin-bottom: 12px; color: #28251D; }
+    .card-section-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #7A7974;
+      margin: 10px 0 4px 0;
+    }
+    .card ul { margin: 0 0 6px 16px; }
+    .card li { font-size: 0.85rem; margin-bottom: 3px; }
+    .card-meta {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid #E8E6E0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 0.8rem;
+    }
+    .card-meta-item { color: #7A7974; }
+    .card-meta-item strong { color: #28251D; }
+    .card-legal {
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: #FFF8F0;
+      border-left: 3px solid #964219;
+      border-radius: 0 4px 4px 0;
+      font-size: 0.8rem;
+      color: #5C3010;
+    }
+    .card-legal strong { color: #964219; }
+    .pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 8px 0; }
+    .pros-cons .pros-label { color: #437A22; font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+    .pros-cons .cons-label { color: #A13544; font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+    .pros-cons ul { margin: 0 0 0 14px; }
+    .pros-cons li { font-size: 0.83rem; margin-bottom: 3px; }
+
+    /* ===== WORKFLOW STEPS ===== */
+    .workflow-steps { list-style: none; margin: 0; counter-reset: step-counter; }
+    .workflow-steps li {
+      counter-increment: step-counter;
+      display: flex;
+      gap: 14px;
+      margin-bottom: 18px;
+      padding: 14px 16px;
+      background: #F9F8F5;
+      border: 1px solid #D4D1CA;
+      border-radius: 6px;
+      align-items: flex-start;
+    }
+    .step-num {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 30px;
+      height: 30px;
+      background: #01696F;
+      color: white;
+      border-radius: 50%;
+      font-size: 0.82rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .step-content { flex: 1; font-size: 0.9rem; }
+    .step-content strong { color: #01696F; }
+    .step-content ul { margin: 6px 0 0 16px; }
+    .step-content li { margin-bottom: 3px; font-size: 0.87rem; }
+
+    /* ===== PATH HEADER ===== */
+    .path-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #01696F;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 6px 6px 0 0;
+      font-weight: 700;
+      font-size: 0.92rem;
+      margin-top: 20px;
+    }
+    .path-block {
+      border: 1px solid #01696F;
+      border-top: none;
+      border-radius: 0 0 6px 6px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    /* ===== STAR RATINGS ===== */
+    .stars { color: #DAA520; letter-spacing: 1px; white-space: nowrap; }
+    .star-empty { color: #D4D1CA; }
+
+    /* ===== SCORE TABLE ===== */
+    .score-high { color: #437A22; font-weight: 700; }
+    .score-mid { color: #964219; font-weight: 600; }
+    .score-low { color: #A13544; font-weight: 600; }
+
+    /* ===== MISC ===== */
+    code {
+      background: #E8E6E0;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.83em;
+    }
+    .section-anchor { display: block; height: 0; }
+    .permitted-table td:first-child { color: #437A22; font-weight: 600; }
+    .permitted-table td:last-child { color: #A13544; font-weight: 600; }
+    .emphasis-teal { color: #01696F; font-weight: 600; }
+    .text-muted { color: #7A7974; }
+    .text-small { font-size: 0.82rem; }
+    .mt-0 { margin-top: 0; }
+    .no-fcra { color: #A13544; font-weight: 600; }
+    .yes-fcra { color: #437A22; font-weight: 600; }
+    .na-fcra { color: #7A7974; }
+    .anti-pattern-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 16px 0; }
+
+    /* ===== FOOTER ===== */
+    .report-footer {
+      margin-top: 40px;
+      padding-top: 24px;
+      border-top: 2px solid #D4D1CA;
+      font-size: 0.8rem;
+      color: #7A7974;
+      line-height: 1.6;
+    }
+    .report-footer strong { color: #28251D; }
+
+    /* ===== PRINT STYLES ===== */
+    @media print {
+      body { display: block; background: white; font-size: 11pt; }
+      #sidebar { display: none !important; }
+      #main {
+        max-width: 100%;
+        padding: 0;
+        margin: 0;
+      }
+      @page {
+        margin: 1in;
+        @bottom-center { content: "Page " counter(page) " of " counter(pages); }
+      }
+      .report-header { background: #01696F !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      thead th { background: #01696F !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .badge-free { background: #437A22 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .badge-freemium { background: #964219 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .badge-paid { background: #A13544 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .step-num { background: #01696F !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      table { page-break-inside: auto; }
+      tr { page-break-inside: avoid; }
+      thead { display: table-header-group; }
+      .card { page-break-inside: avoid; }
+      .callout-warning, .callout-tip { page-break-inside: avoid; }
+      .workflow-steps li { page-break-inside: avoid; }
+      section { page-break-before: auto; }
+      h2 { page-break-after: avoid; }
+      h3 { page-break-after: avoid; }
+      a { color: inherit; text-decoration: none; }
+      .btn-print { display: none; }
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      #sidebar { width: 100%; height: auto; position: static; padding: 16px; border-right: none; border-bottom: 1px solid #D4D1CA; }
+      #main { padding: 24px 20px 40px 20px; }
+      .card-grid { grid-template-columns: 1fr; }
+      .pros-cons { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== SITE NAV BAR ===== -->
+<div style="background:#01696F;color:white;padding:8px 20px;display:flex;align-items:center;justify-content:space-between;gap:1rem;font-family:-apple-system,'Segoe UI',Arial,sans-serif;font-size:0.82rem;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15);">
+  <a href="index.html" style="color:white;text-decoration:none;display:flex;align-items:center;gap:6px;font-weight:600;opacity:0.95;transition:opacity .15s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.95">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+    PI Due Diligence Hub
+  </a>
+  <div style="display:flex;align-items:center;gap:12px;opacity:0.8;font-size:0.75rem;">
+    <span>OSINT Intelligence Report</span>
+    <span style="opacity:0.5;">·</span>
+    <a href="due-diligence.html" style="color:white;text-decoration:none;opacity:0.85;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.85">Due Diligence Guide →</a>
+  </div>
+</div>
+
+<!-- ===== SIDEBAR / TABLE OF CONTENTS ===== -->
+<nav id="sidebar" aria-label="Table of Contents">
+  <div class="toc-title">Table of Contents</div>
+  <ul class="toc-list">
+    <li><a href="#section1"><span class="toc-num">1.</span> Legal Framework &amp; Compliance</a></li>
+    <ul class="toc-sub toc-list">
+      <li><a href="#s1-1">1.1 FCRA Compliance (US)</a></li>
+      <li><a href="#s1-2">1.2 GDPR (EU/UK)</a></li>
+      <li><a href="#s1-3">1.3 Permissible Use Cases</a></li>
+      <li><a href="#s1-4">1.4 Ethical Guidelines</a></li>
+    </ul>
+    <li><a href="#section2"><span class="toc-num">2.</span> People Search</a></li>
+    <ul class="toc-sub toc-list">
+      <li><a href="#s2-2">2.2 Paid Data Brokers</a></li>
+      <li><a href="#s2-3">2.3 Free Tools</a></li>
+      <li><a href="#s2-4">2.4 Workflow</a></li>
+      <li><a href="#s2-5">2.5 Tool Detail Cards</a></li>
+    </ul>
+    <li><a href="#section3"><span class="toc-num">3.</span> Company Due Diligence</a></li>
+    <ul class="toc-sub toc-list">
+      <li><a href="#s3-2">3.2 Free Company Tools</a></li>
+      <li><a href="#s3-3">3.3 Workflow</a></li>
+      <li><a href="#s3-4">3.4 Tool Cards</a></li>
+    </ul>
+    <li><a href="#section4"><span class="toc-num">4.</span> Background Checks</a></li>
+    <ul class="toc-sub toc-list">
+      <li><a href="#s4-2">4.2 Tools Comparison</a></li>
+      <li><a href="#s4-3">4.3 Workflow</a></li>
+      <li><a href="#s4-4">4.4 Public Records</a></li>
+    </ul>
+    <li><a href="#section5"><span class="toc-num">5.</span> GitHub OSINT Toolboxes</a></li>
+    <ul class="toc-sub toc-list">
+      <li><a href="#s5-2">5.2 Toolbox Comparison</a></li>
+      <li><a href="#s5-3">5.3 Detailed Cards</a></li>
+    </ul>
+    <li><a href="#section6"><span class="toc-num">6.</span> AI-Powered OSINT Agents</a></li>
+    <ul class="toc-sub toc-list">
+      <li><a href="#s6-2">6.2 AI Tools Comparison</a></li>
+      <li><a href="#s6-3">6.3 Build Your Own Pipeline</a></li>
+    </ul>
+    <li><a href="#section7"><span class="toc-num">7.</span> Free Public Records</a></li>
+    <ul class="toc-sub toc-list">
+      <li><a href="#s7-1">7.1 US Records</a></li>
+      <li><a href="#s7-2">7.2 UK Records</a></li>
+    </ul>
+    <li><a href="#section8"><span class="toc-num">8.</span> Mistakes &amp; Anti-Patterns</a></li>
+    <li><a href="#section9"><span class="toc-num">9.</span> Recommendations Matrix</a></li>
+    <ul class="toc-sub toc-list">
+      <li><a href="#s9-1">9.1 By Investigation Type</a></li>
+      <li><a href="#s9-2">9.2 By Budget</a></li>
+      <li><a href="#s9-3">9.3 Tool Scoring Matrix</a></li>
+    </ul>
+  </ul>
+  <div class="toc-print-btn">
+    <button class="btn-print" onclick="window.print()">&#128438; Print / Save PDF</button>
+  </div>
+</nav>
+
+<!-- ===== MAIN CONTENT ===== -->
+<main id="main">
+
+  <!-- HEADER -->
+  <header class="report-header">
+    <div class="report-tag">Intelligence Report</div>
+    <h1>OSINT Intelligence Report:<br>People Search, Due Diligence &amp; Background Checks</h1>
+    <p class="subtitle">A Comprehensive Guide to Tools, Workflows, and Legal Compliance</p>
+    <div class="report-meta">
+      <span>April 2026</span>
+      <span>Prepared by: Perplexity Computer</span>
+      <span>Version 1.0</span>
+    </div>
+    <div class="exec-summary">
+      <strong>Executive Summary:</strong> Open-source intelligence (OSINT) encompasses a rich ecosystem of free and commercial tools for investigating individuals, companies, and digital infrastructure — but effective use requires navigating a complex legal landscape including the FCRA, GDPR, and CCPA. This report maps the full landscape of people search platforms (BeenVerified, Intelius, TruthFinder, Instant Checkmate, and free alternatives), company due diligence resources (Companies House, OpenCorporates, OCCRP Aleph, OpenSanctions), and background check tools — with step-by-step investigative workflows for each use case. It further covers the emerging category of AI-powered OSINT agents and curated GitHub toolboxes, providing practitioners with both tactical guidance and a strategic framework for building compliant, cost-effective investigations.
+    </div>
+  </header>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 1: LEGAL FRAMEWORK -->
+  <!-- ============================================================ -->
+  <section id="section1">
+    <a class="section-anchor" id="section1-top"></a>
+    <div class="section-divider"></div>
+    <h2>1. Legal Framework &amp; Compliance</h2>
+
+    <p>Before deploying any OSINT tool or technique, practitioners must establish a lawful basis for their investigation. The regulatory environment varies significantly by jurisdiction, target type, and intended use of the data gathered. This section outlines the key frameworks governing OSINT investigations in the US, EU, and UK.</p>
+
+    <!-- 1.1 FCRA -->
+    <h3 id="s1-1">1.1 FCRA Compliance (US)</h3>
+    <p>The Fair Credit Reporting Act (FCRA) is the primary federal law governing the use of consumer reports in the United States. It applies whenever consumer information is used for employment screening, tenant screening, credit decisions, or other "permissible purposes" defined under the Act.</p>
+
+    <div class="callout-warning">
+      <div class="callout-title">&#9888; Critical Legal Warning</div>
+      <p>The following consumer data broker platforms <strong>explicitly prohibit</strong> use of their data for employment screening, tenant screening, credit decisions, or legal decisions: <strong>BeenVerified, TruthFinder, Intelius, Instant Checkmate, Spokeo, CocoFinder</strong>. Violating these terms of service may also constitute an FCRA violation.</p>
+    </div>
+
+    <h4>Key FCRA Provisions</h4>
+    <ul>
+      <li><strong>Scope:</strong> Governs "consumer reporting agencies" (CRAs) and the use of "consumer reports" for credit, employment, insurance, housing, or other permissible purposes.</li>
+      <li><strong>FCRA-Compliant CRAs</strong> (for employment/housing screening): Checkr, Sterling, HireRight, First Advantage. These are not covered in this report as they require separate employer agreements.</li>
+      <li><strong>Non-FCRA tools</strong> (BeenVerified, TruthFinder, Intelius, Instant Checkmate, Spokeo, CocoFinder) are explicitly <em>not</em> consumer reporting agencies and prohibit use for employment or tenant screening.</li>
+      <li><strong>Civil Liability:</strong> Statutory damages of $100–$1,000 per violation; actual damages; punitive damages; attorney's fees.</li>
+      <li><strong>Criminal Penalties:</strong> Knowing violations can result in criminal prosecution.</li>
+      <li><strong>Adverse Action Requirements:</strong> If using an FCRA report to deny employment/housing, you must provide pre-adverse action notice, copy of the report, and Summary of Rights.</li>
+    </ul>
+
+    <div class="callout-tip">
+      <div class="callout-title">&#128161; Resource</div>
+      <p>See the FTC's official guidance: <a href="https://www.ftc.gov/business-guidance/resources/what-employment-background-screening-companies-need-know-about-fair-credit-reporting-act" target="_blank">What Employment Background Screening Companies Need to Know About the FCRA</a> — ftc.gov</p>
+    </div>
+
+    <!-- 1.2 GDPR -->
+    <h3 id="s1-2">1.2 GDPR (EU/UK)</h3>
+    <p>The General Data Protection Regulation (GDPR) governs the processing of personal data for individuals located in the EU and UK. Its extraterritorial reach means that processing data about EU/UK persons — regardless of where the investigator is located — may trigger GDPR obligations.</p>
+    <ul>
+      <li><strong>Sparse data landscape:</strong> UK and EU people search data is significantly sparser than US equivalents due to GDPR restrictions on public data aggregation and data broker operations.</li>
+      <li><strong>Legitimate interest:</strong> Processing personal data requires a lawful basis; "legitimate interest" may apply for fraud prevention or journalism, but must be documented and balanced against individual rights.</li>
+      <li><strong>Right to erasure:</strong> Data subjects can require data brokers to delete their records. Most major brokers maintain opt-out/removal processes.</li>
+      <li><strong>192.com (UK):</strong> Pulls data from Companies House and the Electoral Roll — both official public registers with established lawful bases under UK GDPR. Still requires legitimate purpose for investigative use.</li>
+      <li><strong>Enforcement risk:</strong> The ICO (UK) and EU supervisory authorities can impose fines up to 4% of global annual turnover or €20M (whichever is greater).</li>
+    </ul>
+
+    <!-- 1.3 Permissible Use -->
+    <h3 id="s1-3">1.3 Permissible Use Cases</h3>
+    <div class="table-wrap">
+      <table class="permitted-table">
+        <thead>
+          <tr>
+            <th style="width:50%">&#9989; Permitted Uses</th>
+            <th style="width:50%">&#10060; Prohibited Uses</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Reconnecting with lost contacts</td>
+            <td>Employment decisions without FCRA consent and compliant CRA</td>
+          </tr>
+          <tr>
+            <td>Personal background research on a new date (self-protection)</td>
+            <td>Tenant screening without FCRA-compliant process</td>
+          </tr>
+          <tr>
+            <td>Verifying the identity of someone you met online</td>
+            <td>Stalking, harassment, or intimidation of any kind</td>
+          </tr>
+          <tr>
+            <td>Journalistic investigation of public figures in the public interest</td>
+            <td>Foreign intelligence gathering or espionage</td>
+          </tr>
+          <tr>
+            <td>Due diligence on a prospective business partner</td>
+            <td>Purchasing or compiling data for spam campaigns</td>
+          </tr>
+          <tr>
+            <td>Security research on your own infrastructure</td>
+            <td>Any use that violates state laws (CCPA, BIPA, etc.)</td>
+          </tr>
+          <tr>
+            <td>Locating a debtor for lawful debt collection (with legal authority)</td>
+            <td>Discriminatory data use (race, religion, national origin, etc.)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 1.4 Ethical Guidelines -->
+    <h3 id="s1-4">1.4 Ethical Guidelines</h3>
+    <div class="callout-tip">
+      <div class="callout-title">&#128204; Core Ethical Principles for OSINT Investigators</div>
+      <ul>
+        <li><strong>Always have a lawful purpose</strong> — Document your reason for initiating an investigation before beginning.</li>
+        <li><strong>Document your chain of custody</strong> — Record every data source, search parameter, and timestamp for findings. This is essential for legal defensibility.</li>
+        <li><strong>Never share or publish PII without consent</strong> — Sharing personal information about private individuals without consent can create liability and cause real harm.</li>
+        <li><strong>Use VPN and OPSEC</strong> — During sensitive investigations, use a VPN to avoid exposing your IP address to the subject or their associates. Use a dedicated browser profile.</li>
+        <li><strong>Verify from at least 2 independent sources</strong> — Data broker accuracy is inconsistent. Never act on a single-source finding for consequential decisions.</li>
+        <li><strong>Respect opt-out rights</strong> — Most data brokers must honor opt-out/removal requests. The People-Search-OSINT GitHub repo includes a Privacy Opt-Out Repository.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 2: PEOPLE SEARCH -->
+  <!-- ============================================================ -->
+  <section id="section2">
+    <div class="section-divider"></div>
+    <h2>2. Investigation Type 1: People Search</h2>
+
+    <!-- 2.1 Overview -->
+    <h3>2.1 Overview</h3>
+    <p>People search investigations aim to locate, identify, and profile private or semi-public individuals using publicly available records, data broker aggregations, and social media footprints. The US has the richest ecosystem of people search tools due to the relative openness of public records (court filings, voter registration, property records, death records), while UK and EU investigations are more constrained by GDPR but still possible through legitimate sources like Companies House and the Electoral Roll.</p>
+    <p>The optimal strategy combines free primary sources (public records) with paid aggregators where depth or comprehensiveness is needed — not the reverse. Most investigations can be significantly advanced using only free tools before any paid subscription is considered.</p>
+
+    <!-- 2.2 Paid Data Broker Table -->
+    <h3 id="s2-2">2.2 Paid Data Broker Comparison Table</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Pricing</th>
+            <th>Coverage</th>
+            <th>Depth</th>
+            <th>Best For</th>
+            <th>FCRA?</th>
+            <th>Rating</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>BeenVerified</strong></td>
+            <td><span class="badge badge-paid">Paid</span><br><small>$17.48/mo (3-mo plan); $26.89/mo (monthly); $1 trial (7-day/100 reports)</small></td>
+            <td>US</td>
+            <td>Deep: criminal, court, social, property, vehicle</td>
+            <td>All-around people search</td>
+            <td class="no-fcra">&#10060; No</td>
+            <td class="stars">&#9733;&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span></td>
+          </tr>
+          <tr>
+            <td><strong>Intelius</strong></td>
+            <td><span class="badge badge-paid">Paid</span><br><small>$21.13/mo (bi-monthly); ~$25/mo (monthly); $0.95 trials; $3.99 PDF extra</small></td>
+            <td>US</td>
+            <td>Deep: address history, associates, criminal, employment</td>
+            <td>Multiple search parameters</td>
+            <td class="no-fcra">&#10060; No</td>
+            <td class="stars">&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span><span class="star-empty">&#9733;</span></td>
+          </tr>
+          <tr>
+            <td><strong>Instant Checkmate</strong></td>
+            <td><span class="badge badge-paid">Paid</span><br><small>$28.09/mo (quarterly); $35.12/mo (monthly); $5.99/mo phone-only</small></td>
+            <td>US</td>
+            <td>Deep: criminal records, social media, contact info</td>
+            <td>Criminal record depth</td>
+            <td class="no-fcra">&#10060; No</td>
+            <td class="stars">&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span><span class="star-empty">&#9733;</span></td>
+          </tr>
+          <tr>
+            <td><strong>TruthFinder</strong></td>
+            <td><span class="badge badge-paid">Paid</span><br><small>~$23–$28/mo; no trial; subscription required</small></td>
+            <td>US</td>
+            <td>Very deep: court documents, property, vehicle, dark web monitoring</td>
+            <td>Investigative-quality reports</td>
+            <td class="no-fcra">&#10060; No</td>
+            <td class="stars">&#9733;&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span></td>
+          </tr>
+          <tr>
+            <td><strong>Spokeo</strong></td>
+            <td><span class="badge badge-paid">Paid</span><br><small>$7.95–$119.95/mo (tiered by report volume)</small></td>
+            <td>US</td>
+            <td>Medium: social media, contact info, basic public records</td>
+            <td>Social media footprint</td>
+            <td class="no-fcra">&#10060; No</td>
+            <td class="stars">&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span><span class="star-empty">&#9733;</span></td>
+          </tr>
+          <tr>
+            <td><strong>CocoFinder</strong></td>
+            <td><span class="badge badge-freemium">Freemium</span><br><small>Free (redirects to Spokeo/Intelius/BeenVerified for full data)</small></td>
+            <td>US</td>
+            <td>Varies (partner-dependent)</td>
+            <td>Free entry point / aggregator gateway</td>
+            <td class="no-fcra">&#10060; No</td>
+            <td class="stars">&#9733;&#9733;<span class="star-empty">&#9733;</span><span class="star-empty">&#9733;</span><span class="star-empty">&#9733;</span></td>
+          </tr>
+          <tr>
+            <td><strong>192.com</strong></td>
+            <td><span class="badge badge-freemium">Freemium</span><br><small>Free (20 searches/day registered); credits for Electoral Roll/Companies House premium records</small></td>
+            <td>UK</td>
+            <td>Medium: Electoral Roll, Companies House, property records</td>
+            <td>UK people search</td>
+            <td class="na-fcra">N/A (UK)</td>
+            <td class="stars">&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span><span class="star-empty">&#9733;</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 2.3 Free People Search Tools -->
+    <h3 id="s2-3">2.3 Free People Search Tools</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Cost</th>
+            <th>Coverage</th>
+            <th>Data Types</th>
+            <th>Limitations</th>
+            <th>Link</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>TruePeopleSearch</strong></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>US</td>
+            <td>Name, address, phone, email</td>
+            <td>US only; aggregated public records</td>
+            <td><a href="https://www.truepeoplesearch.com" target="_blank">truepeoplesearch.com</a></td>
+          </tr>
+          <tr>
+            <td><strong>FastPeopleSearch</strong></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>US</td>
+            <td>Name, address, relatives</td>
+            <td>US only; less detailed than paid tools</td>
+            <td><a href="https://www.fastpeoplesearch.com" target="_blank">fastpeoplesearch.com</a></td>
+          </tr>
+          <tr>
+            <td><strong>ZabaSearch</strong></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>US</td>
+            <td>Address history, phone numbers</td>
+            <td>Basic data only; no sign-up required</td>
+            <td><a href="https://www.zabasearch.com" target="_blank">zabasearch.com</a></td>
+          </tr>
+          <tr>
+            <td><strong>PeekYou</strong></td>
+            <td><span class="badge badge-freemium">Freemium</span></td>
+            <td>Global</td>
+            <td>Social profiles, username search, web presence</td>
+            <td>Limited without premium; weak on Facebook data</td>
+            <td><a href="https://www.peekyou.com" target="_blank">peekyou.com</a></td>
+          </tr>
+          <tr>
+            <td><strong>That's Them</strong></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>US</td>
+            <td>Name, address, phone, email, IP address, VIN search</td>
+            <td>US only; multiple search vectors (unique)</td>
+            <td><a href="https://thatsthem.com" target="_blank">thatsthem.com</a></td>
+          </tr>
+          <tr>
+            <td><strong>WebMii</strong></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>Global</td>
+            <td>Public web presence, social media aggregation</td>
+            <td>Aggregates web results only; no proprietary data</td>
+            <td><a href="https://webmii.com" target="_blank">webmii.com</a></td>
+          </tr>
+          <tr>
+            <td><strong>BT Phonebook</strong></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>UK</td>
+            <td>Listed UK phone numbers and addresses</td>
+            <td>UK listed numbers only; excludes ex-directory</td>
+            <td><a href="https://www.bt.com/directory" target="_blank">bt.com/directory</a></td>
+          </tr>
+          <tr>
+            <td><strong>UK Phonebook</strong></td>
+            <td><span class="badge badge-freemium">Freemium</span></td>
+            <td>UK</td>
+            <td>Electoral Roll, Companies House records</td>
+            <td>GDPR-limited; some records require payment</td>
+            <td><a href="https://www.ukphonebook.com" target="_blank">ukphonebook.com</a></td>
+          </tr>
+          <tr>
+            <td><strong>Skymem</strong></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>Global</td>
+            <td>Email addresses associated with companies and people</td>
+            <td>Email-focused only; no address or phone data</td>
+            <td><a href="https://www.skymem.info" target="_blank">skymem.org</a></td>
+          </tr>
+          <tr>
+            <td><strong>Social Searcher</strong></td>
+            <td><span class="badge badge-freemium">Freemium</span></td>
+            <td>Global</td>
+            <td>Social media content search and monitoring</td>
+            <td>Rate-limited on free tier; paid for volume</td>
+            <td><a href="https://www.social-searcher.com" target="_blank">social-searcher.com</a></td>
+          </tr>
+          <tr>
+            <td><strong>ContactOut</strong></td>
+            <td><span class="badge badge-freemium">Freemium</span></td>
+            <td>Global</td>
+            <td>Professional emails, phone numbers (300M+ professionals)</td>
+            <td>LinkedIn-focused; limited free searches</td>
+            <td><a href="https://contactout.com" target="_blank">contactout.com</a></td>
+          </tr>
+          <tr>
+            <td><strong>PeopleFinder</strong></td>
+            <td><span class="badge badge-paid">Paid</span></td>
+            <td>US</td>
+            <td>Public records database</td>
+            <td>Subscription required for full access</td>
+            <td><a href="https://www.peoplefinder.com" target="_blank">peoplefinder.com</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 2.4 Workflow -->
+    <h3 id="s2-4">2.4 Step-by-Step People Search Workflow</h3>
+    <ol class="workflow-steps">
+      <li>
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <strong>Define Your Target</strong><br>
+          Gather all known identifiers before beginning any search. Essential: full legal name, known aliases or nicknames, approximate age or date of birth, last known location (city/state/country). Helpful: associated phone numbers, email addresses, known employers, vehicle license plates, social media handles.
+        </div>
+      </li>
+      <li>
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <strong>Start With Free Tools First (US)</strong><br>
+          Begin with the free tier: TruePeopleSearch → FastPeopleSearch → ZabaSearch → That's Them. Goal: establish current address, known relatives, phone number(s), and any associated email addresses. Cost: $0. These tools often provide sufficient data for most use cases.
+        </div>
+      </li>
+      <li>
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <strong>Expand to Social Media &amp; Web Presence</strong><br>
+          Search LinkedIn (name + known employer), Facebook search (name + location), PeekYou for username search across platforms, WebMii for general web presence. Look for corroborating data points that match the address and contact information found in Step 2. Note: stay logged out or use a dedicated investigation account.
+        </div>
+      </li>
+      <li>
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <strong>Cross-Reference With Public Records</strong><br>
+          Access primary sources directly:
+          <ul>
+            <li>PACER for federal court records ($0.10/page; free if under $30/quarter)</li>
+            <li>State court websites (many are free via state judiciary portals)</li>
+            <li>JudyRecords (judyrecords.com) for 600M+ US court records — free</li>
+            <li>County property records via county assessor website — almost always free</li>
+            <li>Voter registration records (availability varies by state)</li>
+          </ul>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <strong>Use Paid Aggregator If Needed</strong><br>
+          If free tools leave significant gaps, use BeenVerified or TruthFinder for comprehensive criminal/court/property/vehicle history. Verify the value before committing to a subscription — use the $1 trial offer (BeenVerified). Always cancel auto-renewal if not needed beyond the trial period. Remember: these tools are NOT FCRA-compliant and cannot be used for employment or housing decisions.
+        </div>
+      </li>
+      <li>
+        <div class="step-num">6</div>
+        <div class="step-content">
+          <strong>UK-Specific Path</strong><br>
+          For UK subjects: 192.com (20 free searches/day with registered account) → BT Phonebook (listed numbers) → UK Phonebook → Electoral Roll records (via 192.com credits for premium access). Company connections: Companies House free API. Note: all UK searches are subject to UK GDPR requirements.
+        </div>
+      </li>
+      <li>
+        <div class="step-num">7</div>
+        <div class="step-content">
+          <strong>Verify Findings</strong><br>
+          Cross-check every significant finding: verify address via Google Maps Street View and county property records; verify phone number via reverse lookup (That's Them, Google); confirm social profiles are active and belong to the correct person; do not rely on a single data broker's unverified data for consequential decisions.
+        </div>
+      </li>
+      <li>
+        <div class="step-num">8</div>
+        <div class="step-content">
+          <strong>Document Your Findings</strong><br>
+          Screenshot all findings with visible timestamps and URLs. Note the data source, date accessed, and search parameters for every data point. Create a structured evidence dossier that maintains chain of custody. This documentation is essential for legal defensibility and for distinguishing verified from unverified claims.
+        </div>
+      </li>
+    </ol>
+
+    <!-- 2.5 Tool Cards -->
+    <h3 id="s2-5">2.5 Tool Pros/Cons Detail Cards</h3>
+    <div class="card-grid">
+
+      <!-- BeenVerified Card -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">BeenVerified</div>
+            <div class="card-subtitle">beenverified.com &middot; US Coverage &middot; <span class="badge badge-paid">Paid</span></div>
+          </div>
+        </div>
+        <p class="card-desc">BeenVerified is one of the most comprehensive US data broker platforms, aggregating records from hundreds of public data sources into unified people profiles. It covers criminal records, court filings, social media, property ownership, vehicle records, and associates — and offers a $1 seven-day trial for 100 reports, making it the most accessible entry point for paid people search.</p>
+        <div class="pros-cons">
+          <div>
+            <div class="pros-label">Pros</div>
+            <ul>
+              <li>Comprehensive aggregation from hundreds of sources</li>
+              <li>User-friendly interface; accessible to non-technical users</li>
+              <li>$1 trial for 100 reports (7 days)</li>
+              <li>Covers criminal, property, vehicle, social, and associates</li>
+              <li>Dark web monitoring add-on available</li>
+            </ul>
+          </div>
+          <div>
+            <div class="cons-label">Cons</div>
+            <ul>
+              <li>$17–27/mo subscription required beyond trial</li>
+              <li>Data accuracy inconsistencies — always independently verify</li>
+              <li>Not FCRA-compliant; prohibited for employment/housing</li>
+              <li>Auto-renewal complaints; cancellation can be complex</li>
+              <li>PDF download costs extra beyond subscription</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card-meta">
+          <span class="card-meta-item"><strong>Best for:</strong> All-around US people search; starting point for comprehensive individual profiling</span>
+        </div>
+        <div class="card-legal"><strong>Legal Note:</strong> Explicitly prohibited for employment screening, tenant screening, credit decisions, or any FCRA-regulated purpose. For personal research use only.</div>
+      </div>
+
+      <!-- Intelius Card -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Intelius</div>
+            <div class="card-subtitle">intelius.com &middot; US Coverage &middot; <span class="badge badge-paid">Paid</span></div>
+          </div>
+        </div>
+        <p class="card-desc">Intelius offers three distinct search products — people search, address lookup, and phone lookup — with a large database covering address history, known associates, criminal records, and employment data. Its multiple entry points (name, address, phone, email) make it useful when you have partial identifying information.</p>
+        <div class="pros-cons">
+          <div>
+            <div class="pros-label">Pros</div>
+            <ul>
+              <li>Three distinct plan types optimized for different search types</li>
+              <li>Mobile app available for on-the-go investigations</li>
+              <li>Unlimited reports on subscription plans</li>
+              <li>Large database with broad US coverage</li>
+            </ul>
+          </div>
+          <div>
+            <div class="cons-label">Cons</div>
+            <ul>
+              <li>Confusing pricing structure with multiple add-ons</li>
+              <li>Hidden fees: $3.99 PDF download, $9.95 identity protection add-on</li>
+              <li>$0.95 trials auto-convert to full subscriptions — watch billing</li>
+              <li>Accuracy inconsistencies; data can be outdated</li>
+              <li>Significant billing dispute reports in consumer reviews</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card-meta">
+          <span class="card-meta-item"><strong>Best for:</strong> Multiple search parameters; useful when you have phone or address rather than full name</span>
+        </div>
+        <div class="card-legal"><strong>Legal Note:</strong> Not FCRA-compliant. Explicitly prohibited for employment screening, tenant screening, and credit decisions. Review auto-renewal terms carefully before trial.</div>
+      </div>
+
+      <!-- TruthFinder Card -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">TruthFinder</div>
+            <div class="card-subtitle">truthfinder.com &middot; US Coverage &middot; <span class="badge badge-paid">Paid</span></div>
+          </div>
+        </div>
+        <p class="card-desc">TruthFinder is widely regarded as producing the most investigative-quality reports in the consumer data broker category, including scanned court documents, detailed property history, vehicle records, and dark web monitoring. It is the preferred choice for investigators who need depth over convenience.</p>
+        <div class="pros-cons">
+          <div>
+            <div class="pros-label">Pros</div>
+            <ul>
+              <li>Deepest reports in category: scanned court documents, property history, vehicle records</li>
+              <li>Dark web monitoring included in subscription</li>
+              <li>Investigative-quality depth for serious researchers</li>
+              <li>Covers federal and state criminal records comprehensively</li>
+            </ul>
+          </div>
+          <div>
+            <div class="cons-label">Cons</div>
+            <ul>
+              <li>Among the most expensive in the category (~$23–28/mo)</li>
+              <li>No trial offer available — full subscription required</li>
+              <li>Dense, complex interface; steeper learning curve</li>
+              <li>Not FCRA-compliant; strictly for personal research only</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card-meta">
+          <span class="card-meta-item"><strong>Best for:</strong> Investigators needing the deepest possible consumer-grade report; court document verification</span>
+        </div>
+        <div class="card-legal"><strong>Legal Note:</strong> Not FCRA-compliant. Cannot be used for employment, housing, or credit decisions under any circumstances.</div>
+      </div>
+
+      <!-- 192.com Card -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">192.com</div>
+            <div class="card-subtitle">192.com &middot; UK Coverage &middot; <span class="badge badge-freemium">Freemium</span></div>
+          </div>
+        </div>
+        <p class="card-desc">192.com is the leading UK people search platform, drawing from official UK data sources including the Electoral Roll, Companies House, and land registry data. It is GDPR-aware and uses lawful UK data sources, making it the appropriate first stop for any UK-focused people investigation.</p>
+        <div class="pros-cons">
+          <div>
+            <div class="pros-label">Pros</div>
+            <ul>
+              <li>Free tier: 20 searches/day with a registered account</li>
+              <li>UK-specific Electoral Roll and Companies House data</li>
+              <li>GDPR-aware; uses legitimate UK data sources</li>
+              <li>Company, directorship, and property search capabilities</li>
+            </ul>
+          </div>
+          <div>
+            <div class="cons-label">Cons</div>
+            <ul>
+              <li>Limited free access; credit system for premium Electoral Roll records</li>
+              <li>UK-only coverage — not useful for non-UK subjects</li>
+              <li>Separate credit purchase required for premium records</li>
+              <li>Electoral Roll data may exclude those who opted out</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card-meta">
+          <span class="card-meta-item"><strong>Best for:</strong> UK people search; UK company director lookups; Electoral Roll verification</span>
+        </div>
+        <div class="card-legal"><strong>Legal Note:</strong> UK GDPR applies to all searches involving UK data subjects. Establish legitimate interest before processing. FCRA does not apply (UK jurisdiction).</div>
+      </div>
+
+    </div><!-- end card-grid -->
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 3: COMPANY DUE DILIGENCE -->
+  <!-- ============================================================ -->
+  <section id="section3">
+    <div class="section-divider"></div>
+    <h2>3. Investigation Type 2: Company Due Diligence</h2>
+
+    <!-- 3.1 Overview -->
+    <h3>3.1 Overview</h3>
+    <p>Company due diligence OSINT is used to verify the legitimacy, financial health, and risk profile of a business entity before entering into contracts, partnerships, or investment relationships. The free public record ecosystem for companies is remarkably rich — Companies House (UK), SEC EDGAR (US public companies), OpenCorporates (global), and the OCCRP Aleph investigative database collectively provide a powerful free toolkit that rivals or exceeds many expensive commercial products for most due diligence needs.</p>
+    <p>Critical use cases include: fraud prevention (verifying a company is real and legally registered), partnership vetting (checking directors, ownership structures, and litigation history), investment decisions (financial health, adverse media, sanctions exposure), and supply chain compliance (sanctions screening for business relationships). Skipping sanctions screening for any significant business partner is a serious compliance failure in many jurisdictions.</p>
+
+    <!-- 3.2 Free Company Tools -->
+    <h3 id="s3-2">3.2 Free Company Research Tools</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Cost</th>
+            <th>Jurisdiction</th>
+            <th>Data Types</th>
+            <th>API Available</th>
+            <th>Link</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Companies House</strong></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>UK</td>
+            <td>Company registrations, directors, filings, annual accounts, PSC (beneficial ownership)</td>
+            <td>Yes (free)</td>
+            <td><a href="https://find-and-update.company-information.service.gov.uk" target="_blank">find-and-update.company-information.service.gov.uk</a></td>
+          </tr>
+          <tr>
+            <td><strong>OpenCorporates</strong></td>
+            <td><span class="badge badge-freemium">Freemium</span><br><small>200 req/mo free; paid API for commercial use</small></td>
+            <td>Global (140+ jurisdictions)</td>
+            <td>Company registrations, officers, corporate structures, beneficial ownership</td>
+            <td>Yes (free tier)</td>
+            <td><a href="https://opencorporates.com" target="_blank">opencorporates.com</a></td>
+          </tr>
+          <tr>
+            <td><strong>SEC EDGAR</strong></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>US (public companies)</td>
+            <td>10-K, 10-Q, proxy statements, ownership filings (Form 4, 13F), material events</td>
+            <td>Yes (free)</td>
+            <td><a href="https://www.sec.gov/edgar" target="_blank">sec.gov/edgar</a></td>
+          </tr>
+          <tr>
+            <td><strong>OCCRP Aleph</strong></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>Global</td>
+            <td>Leaked documents, sanctions records, court records, corporate data, investigative data</td>
+            <td>Yes (free)</td>
+            <td><a href="https://aleph.occrp.org" target="_blank">aleph.occrp.org</a></td>
+          </tr>
+          <tr>
+            <td><strong>Open Sanctions</strong></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>Global</td>
+            <td>Sanctions lists, PEP (politically exposed persons) lists, global watchlists</td>
+            <td>Yes (free)</td>
+            <td><a href="https://www.opensanctions.org" target="_blank">opensanctions.org</a></td>
+          </tr>
+          <tr>
+            <td><strong>Open Ownership</strong></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>Global</td>
+            <td>Beneficial ownership data (where jurisdiction participates in BOT standard)</td>
+            <td>Yes (free)</td>
+            <td><a href="https://www.openownership.org" target="_blank">openownership.org</a></td>
+          </tr>
+          <tr>
+            <td><strong>LittleSis</strong></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>US</td>
+            <td>Corporate-political power networks, board connections, lobbying relationships</td>
+            <td>No</td>
+            <td><a href="https://littlesis.org" target="_blank">littlesis.org</a></td>
+          </tr>
+          <tr>
+            <td><strong>FollowTheMoney</strong></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>US (state-level)</td>
+            <td>Campaign finance contributions, political connections, state-level lobbying</td>
+            <td>No</td>
+            <td><a href="https://www.followthemoney.org" target="_blank">followthemoney.org</a></td>
+          </tr>
+          <tr>
+            <td><strong>Endole</strong></td>
+            <td><span class="badge badge-freemium">Freemium</span></td>
+            <td>UK</td>
+            <td>Company financials, directors, credit risk, county court judgments</td>
+            <td>No</td>
+            <td><a href="https://endole.co.uk" target="_blank">endole.co.uk</a></td>
+          </tr>
+          <tr>
+            <td><strong>North Data</strong></td>
+            <td><span class="badge badge-freemium">Freemium</span></td>
+            <td>Germany / EU</td>
+            <td>Company registrations, corporate networks, filings, financial data</td>
+            <td>Yes</td>
+            <td><a href="https://www.northdata.com" target="_blank">northdata.com</a></td>
+          </tr>
+          <tr>
+            <td><strong>FCA Register</strong></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>UK</td>
+            <td>Financial services authorization status, permissions, regulatory history</td>
+            <td>No</td>
+            <td><a href="https://register.fca.org.uk" target="_blank">register.fca.org.uk</a></td>
+          </tr>
+          <tr>
+            <td><strong>Dun &amp; Bradstreet</strong></td>
+            <td><span class="badge badge-paid">Paid</span></td>
+            <td>Global</td>
+            <td>Credit scores, financial health scores, business intelligence, supplier risk</td>
+            <td>Yes (paid)</td>
+            <td><a href="https://www.dnb.com" target="_blank">dnb.com</a></td>
+          </tr>
+          <tr>
+            <td><strong>Maltego</strong></td>
+            <td><span class="badge badge-freemium">Freemium</span><br><small>Community free (limited); Professional (contact sales)</small></td>
+            <td>Global</td>
+            <td>Visual link analysis, corporate network graphs, 100+ data connectors/transforms</td>
+            <td>Yes</td>
+            <td><a href="https://www.maltego.com" target="_blank">maltego.com</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 3.3 Company Due Diligence Workflow -->
+    <h3 id="s3-3">3.3 Step-by-Step Company Due Diligence Workflow</h3>
+    <ol class="workflow-steps">
+      <li>
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <strong>Identify the Entity</strong><br>
+          Obtain the full legal company name, company registration number (if known), jurisdiction of incorporation, and any trading names or DBAs (doing business as). Disambiguation is critical — verify you have the correct entity before proceeding, as common names may have multiple registrations.
+        </div>
+      </li>
+      <li>
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <strong>Verify Registration</strong><br>
+          Confirm legal existence and status via official registries:
+          <ul>
+            <li>UK: Companies House (find-and-update.company-information.service.gov.uk) — free, authoritative</li>
+            <li>US public companies: SEC EDGAR (sec.gov/edgar) — free</li>
+            <li>US private companies: State Secretary of State business registry — usually free</li>
+            <li>Global: OpenCorporates (opencorporates.com) — 140+ jurisdictions, 200 free req/mo</li>
+          </ul>
+          Confirm: legal status (active/dissolved/struck off), registered address, incorporation date, registered agent.
+        </div>
+      </li>
+      <li>
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <strong>Check Directors and Officers</strong><br>
+          Identify all current and historical directors, officers, and significant shareholders:
+          <ul>
+            <li>Companies House (UK): Director history, resignations, disqualifications</li>
+            <li>SEC EDGAR Proxy (US): Executive bios, compensation, ownership stakes</li>
+            <li>OpenCorporates Officers module: Cross-jurisdiction director networks</li>
+          </ul>
+          Cross-reference each director name against other company registrations to identify networks of control or shell company patterns.
+        </div>
+      </li>
+      <li>
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <strong>Sanctions and Watchlist Screening</strong><br>
+          Non-negotiable for any financial or significant business dealing:
+          <ul>
+            <li>OpenSanctions (opensanctions.org): 200+ global lists, free, updated daily</li>
+            <li>OFAC SDN List: sanctionssearch.ofac.treas.gov — free, US Treasury</li>
+            <li>UN Consolidated List: un.org/securitycouncil/content/un-sc-consolidated-list — free</li>
+            <li>EU Sanctions Map: sanctionsmap.eu — free</li>
+          </ul>
+          Screen both the company name and all identified directors/beneficial owners.
+        </div>
+      </li>
+      <li>
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <strong>Beneficial Ownership Investigation</strong><br>
+          Identify the ultimate beneficial owner (UBO) — who ultimately controls or benefits from the company:
+          <ul>
+            <li>OpenOwnership register (openownership.org): For jurisdictions participating in BOT standard</li>
+            <li>Companies House PSC register (UK): Persons with Significant Control — free, mandatory filing</li>
+            <li>OCCRP Aleph (aleph.occrp.org): For complex offshore structures (Panama Papers, FinCEN Files)</li>
+          </ul>
+          Red flags: nominee directors, shell company chains through offshore jurisdictions, opaque ownership structures.
+        </div>
+      </li>
+      <li>
+        <div class="step-num">6</div>
+        <div class="step-content">
+          <strong>Financial Health Assessment</strong><br>
+          Review financial data:
+          <ul>
+            <li>UK: Companies House annual accounts (free); Endole for credit risk analysis (freemium)</li>
+            <li>US public companies: SEC EDGAR 10-K (free) — audited annual financials</li>
+            <li>Global: Dun &amp; Bradstreet credit reports (paid, most comprehensive globally)</li>
+          </ul>
+          Key metrics: revenue trends, profitability, debt levels, going concern notes in auditor's report, any qualified opinions.
+        </div>
+      </li>
+      <li>
+        <div class="step-num">7</div>
+        <div class="step-content">
+          <strong>Adverse Media and Litigation</strong><br>
+          Search for negative news, court proceedings, and regulatory actions:
+          <ul>
+            <li>OCCRP Aleph: Full-text search of leaked documents and investigative databases</li>
+            <li>PACER (pacer.uscourts.gov): Federal court litigation, $0.10/page</li>
+            <li>Google News: "[company name] lawsuit fraud investigation"</li>
+            <li>LittleSis: For corporate-political connections and power network analysis</li>
+            <li>Regulatory databases: FCA (UK), SEC enforcement actions (US)</li>
+          </ul>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">8</div>
+        <div class="step-content">
+          <strong>Digital Footprint Analysis</strong><br>
+          Assess online presence and reputation:
+          <ul>
+            <li>Domain WHOIS: whois.domaintools.com — registration date, registrant, name servers</li>
+            <li>SSL certificate transparency: crt.sh — certificate history and subdomain discovery</li>
+            <li>LinkedIn company page: Employee count trends; recent departures can signal instability</li>
+            <li>Glassdoor: Anonymous employee reviews; patterns of management or financial instability</li>
+            <li>Web Archive: web.archive.org — track website changes and historical claims</li>
+          </ul>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">9</div>
+        <div class="step-content">
+          <strong>Final Risk Assessment</strong><br>
+          Compile findings into a risk tier classification:
+          <ul>
+            <li><strong style="color:#437A22">Green:</strong> Clean registration, clear ownership, no sanctions hits, positive financial indicators, no material adverse media</li>
+            <li><strong style="color:#964219">Amber:</strong> Minor concerns requiring clarification — e.g. dormant periods, nominee directors, limited financial history, isolated adverse media</li>
+            <li><strong style="color:#A13544">Red:</strong> Do not proceed — sanctions hits, dissolved/struck off status, fraudulent indicators, serious litigation, opaque beneficial ownership with no explanation</li>
+          </ul>
+          Document all sources with URLs and access dates for audit trail.
+        </div>
+      </li>
+    </ol>
+
+    <!-- 3.4 Company Tool Cards -->
+    <h3 id="s3-4">3.4 Company OSINT Tool Detail Cards</h3>
+    <div class="card-grid">
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">OpenCorporates</div>
+            <div class="card-subtitle">opencorporates.com &middot; Global (140+ jurisdictions) &middot; <span class="badge badge-freemium">Freemium</span></div>
+          </div>
+        </div>
+        <p class="card-desc">OpenCorporates is the world's largest open database of companies, covering over 200 million companies across more than 140 jurisdictions. It provides a standardized, API-accessible interface to company registration data that would otherwise require accessing dozens of different national registries individually.</p>
+        <div class="pros-cons">
+          <div>
+            <div class="pros-label">Pros</div>
+            <ul>
+              <li>200M+ companies across 140+ jurisdictions</li>
+              <li>Free API for open data/research projects (200 req/mo)</li>
+              <li>Standardized, consistent data format across jurisdictions</li>
+              <li>Beneficial ownership data integration where available</li>
+            </ul>
+          </div>
+          <div>
+            <div class="cons-label">Cons</div>
+            <ul>
+              <li>Free tier rate-limited to 200 API requests/month</li>
+              <li>Coverage quality uneven by jurisdiction</li>
+              <li>Data may lag official registries by weeks or months</li>
+              <li>Commercial use requires paid API plan</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card-legal"><strong>Legal Note:</strong> Data pulled from official public registries. Use remains subject to terms of each source jurisdiction and OpenCorporates' terms of service. Commercial use requires appropriate licensing.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">OCCRP Aleph</div>
+            <div class="card-subtitle">aleph.occrp.org &middot; Global &middot; <span class="badge badge-free">Free</span></div>
+          </div>
+        </div>
+        <p class="card-desc">The Organized Crime and Corruption Reporting Project's Aleph platform is an investigative database containing leaked and obtained documents from major journalistic investigations — including the Panama Papers, FinCEN Files, Pandora Papers — alongside sanctions data, court records, and corporate registration data from dozens of jurisdictions. It is an indispensable resource for deep due diligence.</p>
+        <div class="pros-cons">
+          <div>
+            <div class="pros-label">Pros</div>
+            <ul>
+              <li>Contains Panama Papers, FinCEN Files, Pandora Papers, and more</li>
+              <li>Free for investigative and journalistic use</li>
+              <li>Cross-references multiple leak databases simultaneously</li>
+              <li>Powerful full-text search with entity resolution</li>
+            </ul>
+          </div>
+          <div>
+            <div class="cons-label">Cons</div>
+            <ul>
+              <li>Data can be dated (leaks are point-in-time)</li>
+              <li>Understanding data provenance requires investigative expertise</li>
+              <li>Not all records independently verified</li>
+              <li>Learning curve for advanced query operators</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card-legal"><strong>Legal Note:</strong> OCCRP data includes material from leaked documents. Use for research and journalistic purposes. Publishing findings about private individuals requires independent verification and editorial judgment. Do not act on unverified adverse findings without corroboration.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Open Sanctions</div>
+            <div class="card-subtitle">opensanctions.org &middot; Global (200+ lists) &middot; <span class="badge badge-free">Free</span></div>
+          </div>
+        </div>
+        <p class="card-desc">Open Sanctions aggregates over 200 global sanctions lists, PEP (politically exposed person) databases, and watchlists — including OFAC, EU, UK, UN, and many national lists — into a single searchable, API-accessible database updated daily. It is the most accessible free tool for preliminary sanctions screening.</p>
+        <div class="pros-cons">
+          <div>
+            <div class="pros-label">Pros</div>
+            <ul>
+              <li>Combines 200+ sanctions and PEP lists globally</li>
+              <li>Free API with daily updates</li>
+              <li>Covers OFAC, EU, UK HMT, UN, and more</li>
+              <li>Open-source; data can be downloaded in bulk</li>
+            </ul>
+          </div>
+          <div>
+            <div class="cons-label">Cons</div>
+            <ul>
+              <li>Does not replace formal AML compliance screening software</li>
+              <li>Entity matching is fuzzy — potential false positives/negatives</li>
+              <li>Not a certified compliance solution for regulated industries</li>
+              <li>Requires manual verification of positive matches</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card-legal"><strong>Legal Note:</strong> For regulated industries (finance, fintech), Open Sanctions is suitable for preliminary screening only. Formal AML compliance requires certified screening software with documented processes. All positive matches require manual review and adjudication.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Maltego</div>
+            <div class="card-subtitle">maltego.com &middot; Global &middot; <span class="badge badge-freemium">Freemium</span></div>
+          </div>
+        </div>
+        <p class="card-desc">Maltego is the leading professional OSINT platform for visual link analysis and network graph investigation. It connects to over 100 data sources via "transforms" — automated queries that populate a visual graph of relationships between entities (people, companies, domains, IP addresses, phone numbers, and more).</p>
+        <div class="pros-cons">
+          <div>
+            <div class="pros-label">Pros</div>
+            <ul>
+              <li>Visual link analysis and relationship graph visualization</li>
+              <li>100+ built-in connectors/transforms across data categories</li>
+              <li>Desktop + browser versions; used by law enforcement globally</li>
+              <li>Integrates people, company, domain, and infrastructure data</li>
+            </ul>
+          </div>
+          <div>
+            <div class="cons-label">Cons</div>
+            <ul>
+              <li>Free Community Edition severely limited (12 results per transform)</li>
+              <li>Professional plans require contacting sales — no public pricing</li>
+              <li>Steep learning curve; requires training to use effectively</li>
+              <li>High cost for enterprise-grade use</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card-legal"><strong>Legal Note:</strong> Maltego itself is a neutral tool; legality depends on the data sources accessed via transforms. Some transforms connect to commercial databases with their own terms of service. Ensure each data source accessed is lawful for your jurisdiction and use case.</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 4: BACKGROUND CHECKS -->
+  <!-- ============================================================ -->
+  <section id="section4">
+    <div class="section-divider"></div>
+    <h2>4. Investigation Type 3: Background Checks</h2>
+
+    <!-- 4.1 Overview -->
+    <h3>4.1 Overview</h3>
+    <p>Background checks fall into three distinct categories that require very different tools and legal frameworks: <strong>(1) Employment background checks</strong> — legally regulated by the FCRA; require written consent and FCRA-compliant CRAs. <strong>(2) Personal background checks</strong> — informal research on individuals you are entering into personal or business relationships with; permissible using non-FCRA tools but cannot be used to make employment or housing decisions. <strong>(3) Tenant screening</strong> — like employment, regulated by the FCRA; requires FCRA-compliant CRA and specific process.</p>
+
+    <div class="callout-warning">
+      <div class="callout-title">&#9888; FCRA Warning — Employment Use</div>
+      <p>Using any non-FCRA tool (BeenVerified, TruthFinder, Intelius, Instant Checkmate, Spokeo, etc.) to make employment or tenant screening decisions exposes you to civil liability of $100–$1,000 per violation plus actual damages. <strong>Always use Checkr, Sterling, HireRight, or another certified CRA for employment and housing decisions.</strong></p>
+    </div>
+
+    <!-- 4.2 Background Check Tools Table -->
+    <h3 id="s4-2">4.2 Background Check Tools Comparison</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Cost</th>
+            <th>Use Case</th>
+            <th>Depth</th>
+            <th>FCRA Compliant</th>
+            <th>Turnaround</th>
+            <th>Link</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>BeenVerified</strong></td>
+            <td><span class="badge badge-paid">Paid</span><br><small>$17–$27/mo</small></td>
+            <td>Personal research only</td>
+            <td>Deep</td>
+            <td class="no-fcra">&#10060; No</td>
+            <td>Instant</td>
+            <td><a href="https://www.beenverified.com" target="_blank">beenverified.com</a></td>
+          </tr>
+          <tr>
+            <td><strong>Instant Checkmate</strong></td>
+            <td><span class="badge badge-paid">Paid</span><br><small>$28–$35/mo</small></td>
+            <td>Criminal records focus; personal research</td>
+            <td>Deep</td>
+            <td class="no-fcra">&#10060; No</td>
+            <td>Instant</td>
+            <td><a href="https://www.instantcheckmate.com" target="_blank">instantcheckmate.com</a></td>
+          </tr>
+          <tr>
+            <td><strong>TruthFinder</strong></td>
+            <td><span class="badge badge-paid">Paid</span><br><small>~$23–$28/mo</small></td>
+            <td>Investigative-grade; personal research</td>
+            <td>Very deep</td>
+            <td class="no-fcra">&#10060; No</td>
+            <td>Instant</td>
+            <td><a href="https://www.truthfinder.com" target="_blank">truthfinder.com</a></td>
+          </tr>
+          <tr>
+            <td><strong>Checkr</strong></td>
+            <td><span class="badge badge-paid">Paid</span><br><small>Custom / per-screen</small></td>
+            <td>Employment screening (FCRA compliant)</td>
+            <td>Comprehensive</td>
+            <td class="yes-fcra">&#9989; Yes</td>
+            <td>1–3 days</td>
+            <td><a href="https://checkr.com" target="_blank">checkr.com</a></td>
+          </tr>
+          <tr>
+            <td><strong>Sterling</strong></td>
+            <td><span class="badge badge-paid">Paid</span><br><small>Custom / per-screen</small></td>
+            <td>Employment screening (FCRA compliant)</td>
+            <td>Comprehensive</td>
+            <td class="yes-fcra">&#9989; Yes</td>
+            <td>2–5 days</td>
+            <td><a href="https://www.sterlingcheck.com" target="_blank">sterlingcheck.com</a></td>
+          </tr>
+          <tr>
+            <td><strong>PACER</strong></td>
+            <td><span class="badge badge-freemium">Freemium</span><br><small>$0.10/page; free if &lt;$30/quarter</small></td>
+            <td>Federal court records — all purposes</td>
+            <td>Federal courts only</td>
+            <td class="na-fcra">N/A</td>
+            <td>Instant</td>
+            <td><a href="https://pacer.uscourts.gov" target="_blank">pacer.uscourts.gov</a></td>
+          </tr>
+          <tr>
+            <td><strong>JudyRecords</strong></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>State/county criminal records; personal research</td>
+            <td>State level (600M+ records)</td>
+            <td class="na-fcra">N/A</td>
+            <td>Instant</td>
+            <td><a href="https://www.judyrecords.com" target="_blank">judyrecords.com</a></td>
+          </tr>
+          <tr>
+            <td><strong>Docket Alarm</strong></td>
+            <td><span class="badge badge-freemium">Freemium</span></td>
+            <td>Court docket monitoring; litigation research</td>
+            <td>Federal + state dockets</td>
+            <td class="na-fcra">N/A</td>
+            <td>Instant</td>
+            <td><a href="https://www.docketalarm.com" target="_blank">docketalarm.com</a></td>
+          </tr>
+          <tr>
+            <td><strong>RECAP Archive</strong></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>Federal PACER documents (cached)</td>
+            <td>Federal courts (1B+ docs)</td>
+            <td class="na-fcra">N/A</td>
+            <td>Instant</td>
+            <td><a href="https://archive.recapthelaw.org" target="_blank">archive.recapthelaw.org</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 4.3 Workflow -->
+    <h3 id="s4-3">4.3 Step-by-Step Background Check Workflows</h3>
+
+    <div class="path-header">
+      <span>&#9654;</span> Path A: Personal Background Check (Non-Employment)
+    </div>
+    <div class="path-block">
+      <ol class="workflow-steps" style="margin:0;">
+        <li>
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <strong>Clarify Your Purpose and Legal Basis</strong><br>
+            Document why you are conducting this check. Personal safety, fraud prevention, and due diligence on a business partner are legitimate purposes. Stalking, harassment, or data collection for commercial purposes are not. Retain your documented purpose statement.
+          </div>
+        </li>
+        <li>
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <strong>Gather Subject Identifiers</strong><br>
+            Collect: full legal name, date of birth (or approximate age), last known address, any associated phone numbers or email addresses. SSN (last 4 digits if available) increases matching accuracy in some databases but treat this data with extreme care.
+          </div>
+        </li>
+        <li>
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <strong>Search Free Court Records</strong><br>
+            Begin with free primary sources: JudyRecords (judyrecords.com) for 600M+ US court records → PACER (pacer.uscourts.gov) for federal courts → State court website for the subject's known state(s) of residence. Free state court portals can be found via the NCSC court statistics project.
+          </div>
+        </li>
+        <li>
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <strong>Check Sex Offender Registry</strong><br>
+            Search the National Sex Offender Public Website: nsopw.gov — this is the national aggregator covering all US states, territories, and DC. Free and authoritative. This is a public registry search, not a consumer report, and has no FCRA implications.
+          </div>
+        </li>
+        <li>
+          <div class="step-num">5</div>
+          <div class="step-content">
+            <strong>Check Civil Court Records</strong><br>
+            State court portals for civil judgments, liens, and claims. PACER for federal civil cases. Bankruptcy records are searchable via PACER (federal bankruptcy courts). Public Access to Court Electronic Records covers all federal courts including bankruptcy.
+          </div>
+        </li>
+        <li>
+          <div class="step-num">6</div>
+          <div class="step-content">
+            <strong>Run Aggregator Report If Needed</strong><br>
+            If free sources leave gaps, use BeenVerified ($1 trial) or TruthFinder for a comprehensive summary covering criminal, property, vehicle, and social records. Remember: these are NOT for employment or housing decisions.
+          </div>
+        </li>
+        <li>
+          <div class="step-num">7</div>
+          <div class="step-content">
+            <strong>Verify Criminal Records Directly</strong><br>
+            If an aggregator report shows criminal records, verify the underlying court record directly via PACER or the relevant state court portal. Data brokers sometimes misattribute records; direct court records are authoritative.
+          </div>
+        </li>
+        <li>
+          <div class="step-num">8</div>
+          <div class="step-content">
+            <strong>Document All Sources With Timestamps</strong><br>
+            Screenshot each result with visible URL and timestamp. Note: source name, search date, search parameters used, and result obtained. This documentation protects you legally and maintains the integrity of your investigation.
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <div class="path-header" style="background:#437A22;">
+      <span>&#9654;</span> Path B: Employment Background Check (FCRA Required)
+    </div>
+    <div class="path-block" style="border-color: #437A22;">
+      <div class="callout-warning" style="margin-top:0;">
+        <div class="callout-title">&#9888; Mandatory FCRA Compliance Path</div>
+        <p>This path is legally required for all employment, tenancy, and credit decisions. <strong>Never deviate from these steps or substitute non-FCRA tools.</strong></p>
+      </div>
+      <ol class="workflow-steps" style="margin:0;">
+        <li>
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <strong>Obtain Written Consent (Required)</strong><br>
+            Before initiating any background check, obtain a separate, standalone written disclosure and authorization from the applicant. The disclosure must be on its own page — it cannot be buried in an employment application. Specific language is required by FCRA; use the disclosure/authorization template from your chosen CRA.
+          </div>
+        </li>
+        <li>
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <strong>Use FCRA-Compliant CRA Only</strong><br>
+            Contract with and order reports exclusively from FCRA-compliant Consumer Reporting Agencies: <strong>Checkr, Sterling, HireRight, First Advantage</strong>. Never use BeenVerified, TruthFinder, Intelius, Instant Checkmate, or Spokeo for any employment decision. This is not a preference — it is a federal legal requirement.
+          </div>
+        </li>
+        <li>
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <strong>Receive and Review Report</strong><br>
+            Review the report provided by the FCRA-compliant CRA. Typical turnaround: 1–5 business days. Reports cover criminal records (within FCRA's 7-year lookback for most records), employment history verification, education verification, professional license verification, and motor vehicle records (for driving-related roles).
+          </div>
+        </li>
+        <li>
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <strong>Pre-Adverse Action Notice (Required If Adverse)</strong><br>
+            If you are considering an adverse action (not hiring, not promoting, rescinding offer) based on report contents, you <strong>must</strong> provide: (1) a copy of the consumer report, (2) a written Summary of Rights under the FCRA, and (3) a reasonable waiting period (typically 5 business days) before finalizing any adverse decision.
+          </div>
+        </li>
+        <li>
+          <div class="step-num">5</div>
+          <div class="step-content">
+            <strong>Adverse Action Notice (Required)</strong><br>
+            After the waiting period, if proceeding with adverse action: provide a formal Adverse Action Notice identifying the CRA that provided the report, stating that the CRA did not make the hiring decision, and providing the subject's right to obtain a free copy of the report and dispute inaccuracies.
+          </div>
+        </li>
+        <li>
+          <div class="step-num">6</div>
+          <div class="step-content">
+            <strong>Record Retention</strong><br>
+            Retain all FCRA-related documents (consent forms, reports, adverse action notices) for a minimum of 7 years per FCRA requirements. Implement a secure document management system. Records may be needed to defend against FCRA complaints filed with the CFPB or private litigation.
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- 4.4 Public Records Reference -->
+    <h3 id="s4-4">4.4 Public Records Sources Quick Reference</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Record Type</th>
+            <th>Free Source</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Federal court cases/dockets</td>
+            <td><a href="https://pacer.uscourts.gov" target="_blank">PACER</a></td>
+            <td>$0.10/page; fee waived if total charges under $30/quarter</td>
+          </tr>
+          <tr>
+            <td>Federal court documents (cached)</td>
+            <td><a href="https://archive.recapthelaw.org" target="_blank">RECAP Archive</a></td>
+            <td>Free access to 1B+ documents previously downloaded from PACER</td>
+          </tr>
+          <tr>
+            <td>State/county criminal records</td>
+            <td><a href="https://www.judyrecords.com" target="_blank">JudyRecords</a> + state court portals</td>
+            <td>600M+ US court records on JudyRecords; state portals vary in coverage and access</td>
+          </tr>
+          <tr>
+            <td>National sex offender registry</td>
+            <td><a href="https://www.nsopw.gov" target="_blank">NSOPW</a></td>
+            <td>National aggregator covering all US states, territories, and DC; free and authoritative</td>
+          </tr>
+          <tr>
+            <td>Federal bankruptcy records</td>
+            <td><a href="https://pacer.uscourts.gov" target="_blank">PACER</a></td>
+            <td>All federal bankruptcy courts included in PACER coverage</td>
+          </tr>
+          <tr>
+            <td>Property records</td>
+            <td>County assessor/recorder website</td>
+            <td>Almost always free; search "[county name] assessor property search" to find local portal</td>
+          </tr>
+          <tr>
+            <td>Voter registration</td>
+            <td>State Secretary of State or county clerk</td>
+            <td>Availability and detail vary significantly by state; some require written request</td>
+          </tr>
+          <tr>
+            <td>Business/professional licenses</td>
+            <td>State licensing board websites</td>
+            <td>Usually free public lookup; search "[state] [profession] license lookup"</td>
+          </tr>
+          <tr>
+            <td>Death records (SSDI)</td>
+            <td><a href="https://www.familysearch.org" target="_blank">FamilySearch SSDI</a></td>
+            <td>Free access to Social Security Death Index records via FamilySearch</td>
+          </tr>
+          <tr>
+            <td>UK criminal record check</td>
+            <td><a href="https://www.gov.uk/dbs-check" target="_blank">DBS Check (gov.uk)</a></td>
+            <td>Requires employer or volunteer organization sponsorship; not available for self-check</td>
+          </tr>
+          <tr>
+            <td>UK court records</td>
+            <td><a href="https://www.judiciary.gov.uk" target="_blank">HMCTS</a></td>
+            <td>Limited public access; most records require formal request or court attendance</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 5: GITHUB OSINT TOOLBOXES -->
+  <!-- ============================================================ -->
+  <section id="section5">
+    <div class="section-divider"></div>
+    <h2>5. GitHub OSINT Toolboxes</h2>
+
+    <!-- 5.1 Overview -->
+    <h3>5.1 Overview</h3>
+    <p>GitHub hosts a rich collection of curated OSINT resource lists and automated toolboxes maintained by the investigative community. These range from simple curated HTML pages of useful links (valuable as organized starting points) to sophisticated multi-agent Python frameworks (valuable for automation and scale). The GitHub OSINT ecosystem is valuable for three reasons: it is entirely free, it aggregates community knowledge about which tools are currently working, and it often includes guidance on OPSEC and legal compliance that commercial tools omit.</p>
+
+    <!-- 5.2 Toolbox Comparison -->
+    <h3 id="s5-2">5.2 Toolbox Comparison Table</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Repository</th>
+            <th>Stars</th>
+            <th>Focus</th>
+            <th>Type</th>
+            <th>Language</th>
+            <th>Last Active</th>
+            <th>Free?</th>
+            <th>Best For</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>The-Osint-Toolbox/<br>People-Search-OSINT</strong></td>
+            <td>Active</td>
+            <td>People search (UK-focused)</td>
+            <td>Curated link list</td>
+            <td>HTML</td>
+            <td>2023–active</td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>UK/global people search resource directory</td>
+          </tr>
+          <tr>
+            <td><strong>AnonCatalyst/<br>Coeus-OSINT-ToolBox</strong></td>
+            <td>143 stars</td>
+            <td>General OSINT</td>
+            <td>Framework + resource list</td>
+            <td>HTML/Python (78%/22%)</td>
+            <td>2024–active</td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>General OSINT investigations, social media</td>
+          </tr>
+          <tr>
+            <td><strong>dazzyddos/<br>OSINT_AI_Agent</strong></td>
+            <td>13 stars</td>
+            <td>Domain/infrastructure recon</td>
+            <td>CLI agent framework</td>
+            <td>Python</td>
+            <td>2026</td>
+            <td><span class="badge badge-freemium">Free*</span><br><small>*API keys required</small></td>
+            <td>Security researchers, domain reconnaissance</td>
+          </tr>
+          <tr>
+            <td><strong>The-Osint-Toolbox/<br>Company-Business-OSINT</strong></td>
+            <td>Active</td>
+            <td>Company research (UK)</td>
+            <td>Curated link list</td>
+            <td>HTML</td>
+            <td>2023–active</td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>UK company due diligence resource directory</td>
+          </tr>
+          <tr>
+            <td><strong>cipher387/<br>osint_stuff_tool_collection</strong></td>
+            <td>High (4k+)</td>
+            <td>Comprehensive OSINT</td>
+            <td>Curated mega-list</td>
+            <td>Markdown</td>
+            <td>Active</td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>Comprehensive starting point; tool discovery</td>
+          </tr>
+          <tr>
+            <td><strong>jivoi/awesome-osint</strong></td>
+            <td>High (17k+)</td>
+            <td>Everything OSINT</td>
+            <td>Awesome-list format</td>
+            <td>Markdown</td>
+            <td>Active</td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>Learning resources; beginner orientation</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 5.3 Detailed Tool Cards -->
+    <h3 id="s5-3">5.3 Detailed Repository Cards</h3>
+
+    <div class="card" style="margin-bottom:20px;">
+      <div class="card-header">
+        <div>
+          <div class="card-title">The-Osint-Toolbox / People-Search-OSINT</div>
+          <div class="card-subtitle"><a href="https://github.com/The-Osint-Toolbox/People-Search-OSINT" target="_blank">github.com/The-Osint-Toolbox/People-Search-OSINT</a> &middot; HTML &middot; <span class="badge badge-free">Free</span></div>
+        </div>
+      </div>
+      <p class="card-desc">A curated HTML resource list focused on people search with particular strength in UK coverage — a gap that most US-centric OSINT resources fail to address. Also includes a Privacy Opt-Out Repository for subjects who want their data removed from data brokers.</p>
+      <div class="card-section-label">Key Tools Included</div>
+      <p style="font-size:0.87rem; margin-bottom:8px;">192.com, BeenVerified, BT Phonebook, ContactOut, FastPeopleSearch, Intelius, PeekYou, PeopleFinder, Social Searcher, TruePeopleSearch, TruthFinder, UK Phonebook, WebMii, ZabaSearch + Privacy Opt-Out Repository</p>
+      <div class="pros-cons">
+        <div>
+          <div class="pros-label">Pros</div>
+          <ul>
+            <li>Covers both US and UK resources (rare combination)</li>
+            <li>Includes privacy opt-out guidance for subjects</li>
+            <li>Organized by category; easy to navigate</li>
+            <li>Regularly maintained; free and open-source</li>
+          </ul>
+        </div>
+        <div>
+          <div class="cons-label">Cons</div>
+          <ul>
+            <li>No automation or scripts — purely reference material</li>
+            <li>Some links may go stale between updates</li>
+            <li>No built-in workflow guidance</li>
+            <li>HTML-only; no API or programmatic interface</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card-meta">
+        <span class="card-meta-item"><strong>Best for:</strong> Starting point for manual investigations, especially UK-focused people searches</span>
+      </div>
+      <div class="card-legal"><strong>Legal Note:</strong> Includes UK Electoral Roll sources — UK GDPR applies for all EU/UK data subjects. Legitimate purpose must be established and documented before accessing Electoral Roll records.</div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px;">
+      <div class="card-header">
+        <div>
+          <div class="card-title">AnonCatalyst / Coeus-OSINT-ToolBox</div>
+          <div class="card-subtitle"><a href="https://github.com/AnonCatalyst/Coeus-OSINT-ToolBox" target="_blank">github.com/AnonCatalyst/Coeus-OSINT-ToolBox</a> &middot; HTML + Python &middot; <span class="badge badge-free">Free</span></div>
+        </div>
+      </div>
+      <p class="card-desc">Coeus is an OSINT platform framework combining an HTML resource directory with Python tooling, structured across investigation, communication, web resources, and development categories. Unlike pure link lists, it incorporates functional tools for social media monitoring, username search, data analysis, and anonymous communication.</p>
+      <div class="card-section-label">Categories</div>
+      <p style="font-size:0.87rem; margin-bottom:8px;">Investigation (background check, people search, username search), Communication tools (anonymous calls/text/email), Web resources (forums, paste sites, proxy services, deep web search engines), Development resources. Notable: centralized platform design, social media monitoring, VPN usage guidance, delete-your-info guide.</p>
+      <div class="pros-cons">
+        <div>
+          <div class="pros-label">Pros</div>
+          <ul>
+            <li>More than just links — includes Python tooling</li>
+            <li>Covers deep web resources alongside surface web</li>
+            <li>Anonymous communication tools included</li>
+            <li>MIT license; comprehensive breadth; actively maintained</li>
+          </ul>
+        </div>
+        <div>
+          <div class="cons-label">Cons</div>
+          <ul>
+            <li>Smaller community (143 stars) — less battle-tested</li>
+            <li>Dead links reported; maintainer acknowledged</li>
+            <li>No formal releases; requires technical comfort</li>
+            <li>Some deep-web resources are legally sensitive</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card-meta">
+        <span class="card-meta-item"><strong>Best for:</strong> Technical investigators who want a framework beyond a static link list</span>
+      </div>
+      <div class="card-legal"><strong>Legal Note:</strong> Deep web access and anonymous communication tools require careful legal consideration by jurisdiction. Dark/deep web browsing is not illegal, but some content accessed may be. Use responsibly and in accordance with applicable law.</div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px;">
+      <div class="card-header">
+        <div>
+          <div class="card-title">dazzyddos / OSINT_AI_Agent</div>
+          <div class="card-subtitle"><a href="https://github.com/dazzyddos/OSINT_AI_Agent" target="_blank">github.com/dazzyddos/OSINT_AI_Agent</a> &middot; Python &middot; <span class="badge badge-freemium">Free*</span></div>
+        </div>
+      </div>
+      <p class="card-desc">OSINT_AI_Agent is a multi-agent LangGraph framework for automated domain and infrastructure reconnaissance. It orchestrates three specialized AI agents — Recon, Shodan, and Fingerprint — via a supervisor state machine, generating AI-synthesized security assessment reports from passive recon data.</p>
+      <div class="card-section-label">Architecture &amp; Capabilities</div>
+      <ul style="font-size:0.87rem; margin-bottom:8px; margin-left:18px;">
+        <li><strong>Supervisor Agent:</strong> Orchestrates workflow via LangGraph state machine with checkpointing</li>
+        <li><strong>Recon Agent:</strong> Subdomain enumeration via Docker-based Subfinder</li>
+        <li><strong>Shodan Agent:</strong> Shodan API intelligence gathering on discovered hosts</li>
+        <li><strong>Fingerprint Agent:</strong> Technology fingerprinting via WhatWeb + httpx</li>
+        <li><strong>LLM Backend:</strong> DeepSeek (default); configurable for GPT-4o, Claude 3.7</li>
+        <li><strong>Output:</strong> AI-generated security assessment report</li>
+      </ul>
+      <div class="card-section-label">Requirements</div>
+      <p style="font-size:0.87rem; margin-bottom:8px;">Python 3.11+, Docker (for Subfinder/WhatWeb/httpx), DeepSeek API key (or alternative LLM), Shodan API key</p>
+      <div class="pros-cons">
+        <div>
+          <div class="pros-label">Pros</div>
+          <ul>
+            <li>True AI-orchestrated multi-agent pipeline</li>
+            <li>Docker isolation for tool execution</li>
+            <li>State checkpointing via LangGraph</li>
+            <li>Configurable LLM backend; MIT license</li>
+          </ul>
+        </div>
+        <div>
+          <div class="cons-label">Cons</div>
+          <ul>
+            <li>Domain/infrastructure only — not people search</li>
+            <li>Requires Docker + multiple API keys</li>
+            <li>Early stage (13 stars); limited community support</li>
+            <li>Passive recon only; primarily for security researchers</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card-meta">
+        <span class="card-meta-item"><strong>Best for:</strong> Security researchers and pentesters conducting authorized domain reconnaissance</span>
+      </div>
+      <div class="card-legal"><strong>Legal Note:</strong> Authorized use only. Running reconnaissance against domains without explicit permission may violate the Computer Fraud and Abuse Act (CFAA) or equivalent laws in other jurisdictions. Always obtain written authorization before scanning any infrastructure you do not own.</div>
+    </div>
+
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 6: AI-POWERED OSINT AGENTS -->
+  <!-- ============================================================ -->
+  <section id="section6">
+    <div class="section-divider"></div>
+    <h2>6. AI-Powered OSINT Agents</h2>
+
+    <!-- 6.1 Overview -->
+    <h3>6.1 Overview</h3>
+    <p>Artificial intelligence is transforming OSINT by enabling automated data collection, intelligent correlation of disparate signals, and AI-generated investigation reports that previously required significant manual analyst time. The current generation of AI OSINT tools ranges from open-source multi-agent frameworks (like OSINT_AI_Agent) to commercial platforms with proprietary AI-powered entity resolution (Maltego, ShadowDragon), and from AI-augmented traditional tools (SpiderFoot HX) to purpose-built fraud detection AI (SEON).</p>
+    <p>For most investigators, the most practical immediate application of AI in OSINT is as an analyst assistant: using GPT-4o or Claude to generate targeted Google dork queries, summarize lengthy documents, draft investigation reports from structured data, and identify patterns across multiple data points. Building a full AI pipeline with LangGraph is the next step for those with technical capability.</p>
+
+    <!-- 6.2 AI Tools Comparison -->
+    <h3 id="s6-2">6.2 AI OSINT Tools Comparison</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Type</th>
+            <th>Cost</th>
+            <th>Capabilities</th>
+            <th>LLM Backend</th>
+            <th>Maturity</th>
+            <th>Best For</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>dazzyddos/OSINT_AI_Agent</strong></td>
+            <td>Open-source multi-agent</td>
+            <td><span class="badge badge-freemium">Free*</span><br><small>API keys required</small></td>
+            <td>Domain recon, subdomain enumeration, Shodan intelligence, technology fingerprinting, AI-generated reports</td>
+            <td>DeepSeek / GPT-4o / Claude (configurable)</td>
+            <td>Early (13 stars)</td>
+            <td>Security researchers, authorized domain recon</td>
+          </tr>
+          <tr>
+            <td><strong>Maltego with AI transforms</strong></td>
+            <td>Commercial platform</td>
+            <td><span class="badge badge-freemium">Freemium</span><br><small>Community free; Enterprise contact sales</small></td>
+            <td>Visual link analysis, AI-powered entity resolution, 100+ data connectors, relationship graph mapping</td>
+            <td>Various (via transform connectors)</td>
+            <td>Mature</td>
+            <td>Professional investigators; law enforcement</td>
+          </tr>
+          <tr>
+            <td><strong>SpiderFoot / SpiderFoot HX</strong></td>
+            <td>Open-source + managed SaaS</td>
+            <td><span class="badge badge-freemium">Freemium</span><br><small>Free self-host; HX paid</small></td>
+            <td>200+ OSINT modules, automated multi-source collection, API integration, correlation engine</td>
+            <td>N/A (rule-based correlation)</td>
+            <td>Mature</td>
+            <td>Automated multi-source OSINT collection at scale</td>
+          </tr>
+          <tr>
+            <td><strong>SEON</strong></td>
+            <td>Commercial SaaS</td>
+            <td><span class="badge badge-paid">Paid</span><br><small>Contact sales</small></td>
+            <td>Fraud detection, digital footprint scoring, email/phone/IP analysis, device intelligence</td>
+            <td>Proprietary AI</td>
+            <td>Mature</td>
+            <td>Fraud prevention; fintech; e-commerce trust</td>
+          </tr>
+          <tr>
+            <td><strong>ShadowDragon</strong></td>
+            <td>Commercial (LEA/Enterprise)</td>
+            <td><span class="badge badge-paid">Paid</span><br><small>Contact sales</small></td>
+            <td>600+ data sources, link analysis, real-time monitoring, social media intelligence</td>
+            <td>Proprietary</td>
+            <td>Mature</td>
+            <td>Law enforcement; enterprise investigative teams</td>
+          </tr>
+          <tr>
+            <td><strong>Google Dorks + ChatGPT/Claude</strong></td>
+            <td>Manual + AI-assisted</td>
+            <td><span class="badge badge-freemium">Freemium</span><br><small>Free (GPT-4o/Claude free tier + Google)</small></td>
+            <td>AI-assisted dork generation, result interpretation and analysis, report drafting, pattern identification</td>
+            <td>GPT-4o / Claude 3.7</td>
+            <td>DIY</td>
+            <td>Researchers; journalists; low-budget investigations</td>
+          </tr>
+          <tr>
+            <td><strong>Hunchly</strong></td>
+            <td>Desktop application</td>
+            <td><span class="badge badge-freemium">Freemium</span><br><small>Free trial; annual plan</small></td>
+            <td>Web capture with chain of custody, case management, automatic page hashing, annotation</td>
+            <td>N/A</td>
+            <td>Mature</td>
+            <td>Evidence preservation; legal-grade documentation</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 6.3 Build Your Own Pipeline -->
+    <h3 id="s6-3">6.3 Building Your Own AI OSINT Pipeline (Technical Guidance)</h3>
+    <p>For technically capable investigators, a custom AI OSINT pipeline offers maximum flexibility and can be tailored to specific investigation workflows. Below is a five-step architectural approach, using <code>OSINT_AI_Agent</code> as the reference implementation:</p>
+
+    <ol class="workflow-steps">
+      <li>
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <strong>Choose LLM Backend</strong><br>
+          Select based on capability, cost, and privacy requirements:
+          <ul>
+            <li><strong>OpenAI GPT-4o:</strong> Best general capability; cloud-hosted; requires API key (~$0.01-0.03/1K tokens)</li>
+            <li><strong>Anthropic Claude 3.7 Sonnet:</strong> Excellent for long document analysis and structured output; cloud-hosted</li>
+            <li><strong>Local via Ollama:</strong> Privacy-preserving; models like Llama 3, Mistral, or DeepSeek-R1; free after hardware cost; no data leaves your system</li>
+            <li><strong>DeepSeek API:</strong> Significantly lower cost than OpenAI; strong reasoning; OSINT_AI_Agent default</li>
+          </ul>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <strong>Use LangGraph or AutoGen for Multi-Agent Orchestration</strong><br>
+          Reference the OSINT_AI_Agent architecture: a <code>Supervisor</code> agent routes tasks to specialized sub-agents (Recon, Shodan, Fingerprint) via a LangGraph state machine with checkpointing. This pattern scales to any OSINT use case — swap recon agents for people search, company lookup, or social media monitoring agents.
+        </div>
+      </li>
+      <li>
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <strong>Connect OSINT APIs</strong><br>
+          Key APIs to integrate based on investigation type:
+          <ul>
+            <li><strong>Domain/Infra:</strong> Shodan API, VirusTotal API, Censys API, SecurityTrails</li>
+            <li><strong>People:</strong> FullContact People API, Hunter.io (email), ContactOut API</li>
+            <li><strong>Companies:</strong> OpenCorporates API (free 200 req/mo), Companies House API (free), SEC EDGAR API (free)</li>
+            <li><strong>Sanctions:</strong> OpenSanctions API (free)</li>
+            <li><strong>Courts:</strong> PACER API (federal, pay-per-use)</li>
+          </ul>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <strong>Implement Structured Output with Pydantic</strong><br>
+          Use Pydantic models with LangChain's structured output capabilities to ensure consistent, machine-readable results from each agent. This enables downstream agents to reliably parse and act on upstream agent outputs, and produces clean structured data for final report generation.
+        </div>
+      </li>
+      <li>
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <strong>Add Evidence Capture and Chain-of-Custody Logging</strong><br>
+          Integrate Hunchly (desktop browser extension) for automated web evidence capture with SHA-256 hashing and timestamping. Supplement with programmatic logging: record every API call, response hash, timestamp, and search parameter in a structured investigation log. This maintains defensible chain of custody for any findings used in legal or compliance contexts.
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 7: FREE PUBLIC RECORDS -->
+  <!-- ============================================================ -->
+  <section id="section7">
+    <div class="section-divider"></div>
+    <h2>7. Free Public Records &amp; Open Data Sources</h2>
+
+    <p>The most accurate and legally defensible OSINT findings come from primary public record sources — not commercial aggregators. These free sources are authoritative, regularly updated, and carry no FCRA compliance concerns for legitimate research purposes.</p>
+
+    <!-- 7.1 US Records -->
+    <h3 id="s7-1">7.1 US Public Records Quick Reference</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Record Type</th>
+            <th>Source</th>
+            <th>URL</th>
+            <th>Cost</th>
+            <th>Coverage</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Federal court cases/dockets</td>
+            <td>PACER</td>
+            <td><a href="https://pacer.uscourts.gov" target="_blank">pacer.uscourts.gov</a></td>
+            <td><span class="badge badge-freemium">$0.10/pg</span><br><small>Free &lt;$30/qtr</small></td>
+            <td>All federal courts</td>
+          </tr>
+          <tr>
+            <td>Federal court documents (cached)</td>
+            <td>RECAP Archive</td>
+            <td><a href="https://archive.recapthelaw.org" target="_blank">archive.recapthelaw.org</a></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>1B+ PACER documents cached by CourtListener</td>
+          </tr>
+          <tr>
+            <td>State/county criminal records</td>
+            <td>JudyRecords</td>
+            <td><a href="https://www.judyrecords.com" target="_blank">judyrecords.com</a></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>600M+ US court records across 50 states</td>
+          </tr>
+          <tr>
+            <td>National sex offender registry</td>
+            <td>NSOPW</td>
+            <td><a href="https://www.nsopw.gov" target="_blank">nsopw.gov</a></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>All US states, territories, and DC</td>
+          </tr>
+          <tr>
+            <td>SEC filings (public companies)</td>
+            <td>EDGAR</td>
+            <td><a href="https://www.sec.gov/edgar" target="_blank">sec.gov/edgar</a></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>All SEC registrants; full filing history</td>
+          </tr>
+          <tr>
+            <td>Corporate registrations</td>
+            <td>OpenCorporates</td>
+            <td><a href="https://opencorporates.com" target="_blank">opencorporates.com</a></td>
+            <td><span class="badge badge-freemium">Free (limited)</span></td>
+            <td>140+ jurisdictions; 200M+ companies</td>
+          </tr>
+          <tr>
+            <td>Sanctions / PEP lists</td>
+            <td>OpenSanctions</td>
+            <td><a href="https://www.opensanctions.org" target="_blank">opensanctions.org</a></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>200+ global sanctions and watchlists</td>
+          </tr>
+          <tr>
+            <td>Beneficial ownership data</td>
+            <td>OpenOwnership</td>
+            <td><a href="https://www.openownership.org" target="_blank">openownership.org</a></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>Participating jurisdictions (BOT standard)</td>
+          </tr>
+          <tr>
+            <td>OFAC US sanctions</td>
+            <td>OFAC SDN Search</td>
+            <td><a href="https://sanctionssearch.ofac.treas.gov" target="_blank">sanctionssearch.ofac.treas.gov</a></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>US Treasury OFAC Specially Designated Nationals list</td>
+          </tr>
+          <tr>
+            <td>Investigative document leaks</td>
+            <td>OCCRP Aleph</td>
+            <td><a href="https://aleph.occrp.org" target="_blank">aleph.occrp.org</a></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>Panama Papers, FinCEN Files, Pandora Papers, and more</td>
+          </tr>
+          <tr>
+            <td>US federal campaign finance</td>
+            <td>OpenSecrets</td>
+            <td><a href="https://www.opensecrets.org" target="_blank">opensecrets.org</a></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>US federal campaign contributions and lobbying</td>
+          </tr>
+          <tr>
+            <td>US political connections</td>
+            <td>LittleSis</td>
+            <td><a href="https://littlesis.org" target="_blank">littlesis.org</a></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>Corporate-political power networks in the US</td>
+          </tr>
+          <tr>
+            <td>Property records</td>
+            <td>County assessor websites</td>
+            <td>Varies by county</td>
+            <td><span class="badge badge-free">Usually free</span></td>
+            <td>County-level; search "[county] assessor property search"</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7.2 UK Records -->
+    <h3 id="s7-2">7.2 UK Public Records Quick Reference</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Record Type</th>
+            <th>Source</th>
+            <th>Cost</th>
+            <th>Coverage</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Company registrations, directors, filings</td>
+            <td><a href="https://find-and-update.company-information.service.gov.uk" target="_blank">Companies House</a></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>All UK registered companies; directors; PSC; annual accounts; free API</td>
+          </tr>
+          <tr>
+            <td>Electoral Roll / People search</td>
+            <td><a href="https://www.192.com" target="_blank">192.com</a></td>
+            <td><span class="badge badge-freemium">20 free/day; credits for premium</span></td>
+            <td>UK residents via Electoral Roll (GDPR-aware)</td>
+          </tr>
+          <tr>
+            <td>Listed phone numbers</td>
+            <td><a href="https://www.bt.com/directory" target="_blank">BT Phonebook</a> / <a href="https://www.ukphonebook.com" target="_blank">UK Phonebook</a></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>UK listed telephone numbers; excludes ex-directory</td>
+          </tr>
+          <tr>
+            <td>Financial services firms / authorization</td>
+            <td><a href="https://register.fca.org.uk" target="_blank">FCA Register</a></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>All FCA-authorized firms and individuals; permission history</td>
+          </tr>
+          <tr>
+            <td>Insolvency records</td>
+            <td><a href="https://www.gov.uk/search-bankruptcy-insolvency-register" target="_blank">UK Individual Insolvency Register</a></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>UK bankruptcy, debt relief orders, individual voluntary arrangements</td>
+          </tr>
+          <tr>
+            <td>Planning permissions</td>
+            <td><a href="https://reversepp.uk" target="_blank">ReversePP</a></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>UK planning application data (useful for property/development OSINT)</td>
+          </tr>
+          <tr>
+            <td>Criminal record check</td>
+            <td><a href="https://www.gov.uk/dbs-check" target="_blank">DBS Check (gov.uk)</a></td>
+            <td><span class="badge badge-paid">Employer-sponsored</span></td>
+            <td>England &amp; Wales; requires employer or volunteer organization sponsor</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout-tip">
+      <div class="callout-title">&#128161; Primary Source Principle</div>
+      <p>Free public records from official registries (Companies House, EDGAR, PACER, NSOPW) are typically <em>more accurate</em> than paid data broker aggregations because they come directly from the authoritative source with no intermediate processing. Always verify data broker findings against primary sources before taking any consequential action.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 8: MISTAKES & ANTI-PATTERNS -->
+  <!-- ============================================================ -->
+  <section id="section8">
+    <div class="section-divider"></div>
+    <h2>8. Common Mistakes &amp; Anti-Patterns</h2>
+
+    <h3>8.1 The 10 Most Common OSINT Mistakes</h3>
+    <ol class="workflow-steps">
+      <li>
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <strong>Using Non-FCRA Tools for Employment Decisions</strong><br>
+          BeenVerified, TruthFinder, Intelius, Instant Checkmate, and Spokeo explicitly prohibit use of their data for employment screening, tenant screening, or credit decisions. Violating FCRA exposes you to civil liability of $100–$1,000 per violation plus actual damages and attorney's fees. Class action risk is real — multiple class actions have been filed against employers for this exact violation. Always use Checkr, Sterling, or another certified CRA for employment screening.
+        </div>
+      </li>
+      <li>
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <strong>Trusting a Single Source</strong><br>
+          Data brokers aggregate from public records that may be years out of date, or may have been erroneously attributed to the wrong person (common with same-name confusion). Always cross-reference critical information — address, phone, criminal records — from at least 2 independent sources before acting on findings. A single data point from a paid aggregator is a hypothesis, not a fact.
+        </div>
+      </li>
+      <li>
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <strong>Confusing Preview Results With Actual Data</strong><br>
+          Most data broker sites show enticing "previews" — name match, approximate city, indication of "criminal records found" — to hook you into subscribing. The actual report you receive after paying may contain significantly less detail than the preview implied, or the "criminal records" may be minor civil infractions. Never subscribe based solely on what the preview promises.
+        </div>
+      </li>
+      <li>
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <strong>Ignoring Opt-Out and Removal Rights</strong><br>
+          If you are the subject of an investigation and want your data removed, most major data brokers (BeenVerified, Spokeo, Intelius, TruthFinder, Instant Checkmate, TruePeopleSearch, FastPeopleSearch) offer opt-out/removal processes. The <a href="https://github.com/The-Osint-Toolbox/People-Search-OSINT" target="_blank">People-Search-OSINT GitHub repository</a> includes a Privacy Opt-Out Repository with instructions for each major platform. Conversely, investigators should be aware that subjects may have already opted out, resulting in incomplete profiles.
+        </div>
+      </li>
+      <li>
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <strong>Not Documenting the Investigation Chain</strong><br>
+          OSINT findings are only useful if you can prove where they came from and when you obtained them. Screenshot all findings with visible timestamps and URLs. Note the search parameters used. Create a structured evidence log for every investigation. Without documentation, findings cannot be acted upon in legal or compliance contexts — and you cannot defend yourself against allegations of fabrication.
+        </div>
+      </li>
+      <li>
+        <div class="step-num">6</div>
+        <div class="step-content">
+          <strong>Tipping Off the Subject</strong><br>
+          Visiting a subject's LinkedIn profile while logged in will generate a "profile viewed" notification. Similarly, joining Facebook groups or following accounts may alert the subject. Use logged-out browser sessions, Google cache, or a dedicated OSINT browser profile. For sensitive investigations, use a VPN and a completely separate browser identity. The web.archive.org Wayback Machine provides historical snapshots without alerting the target.
+        </div>
+      </li>
+      <li>
+        <div class="step-num">7</div>
+        <div class="step-content">
+          <strong>UK/EU GDPR Violations</strong><br>
+          Collecting, storing, or processing personal data about EU/UK individuals for non-legitimate purposes violates GDPR — even if the investigator is based outside the EU/UK. "Legitimate interest" must be established and documented before any investigation of EU/UK data subjects. The ICO (UK) and EU data protection authorities can impose fines up to 4% of global annual turnover. UK Electoral Roll searches via 192.com require legitimate purpose documentation.
+        </div>
+      </li>
+      <li>
+        <div class="step-num">8</div>
+        <div class="step-content">
+          <strong>Assuming Free = Less Accurate</strong><br>
+          Free public records (PACER, Companies House, SEC EDGAR, NSOPW, OpenSanctions) are often <em>more accurate</em> than paid aggregators because they come directly from authoritative primary sources with no intermediate processing, interpretation, or attribution errors. Paid aggregators add convenience but also add a layer of potential inaccuracy. Always verify against free primary sources for consequential findings.
+        </div>
+      </li>
+      <li>
+        <div class="step-num">9</div>
+        <div class="step-content">
+          <strong>Skipping Sanctions Screening for Business Partners</strong><br>
+          For any significant business relationship — new supplier, customer, partner, investor — OFAC/UN/EU sanctions screening is a legal compliance requirement in many jurisdictions, not an optional step. Using OpenSanctions (free, 200+ lists, daily updates) takes minutes and can prevent catastrophic legal exposure. A business relationship with a sanctioned entity can itself constitute a sanctions violation, regardless of intent.
+        </div>
+      </li>
+      <li>
+        <div class="step-num">10</div>
+        <div class="step-content">
+          <strong>Not Using VPN and OPSEC</strong><br>
+          Many data broker and OSINT platform websites log visitor IP addresses. If the subject of your investigation has allies or access to the site's logs, they could identify your IP address — potentially identifying your organization or location. Use a commercial VPN for all OSINT investigations (especially against potentially hostile subjects). Use a dedicated browser profile with no personal login sessions active. Consider Tor for particularly sensitive investigations.
+        </div>
+      </li>
+    </ol>
+
+    <!-- 8.2 Anti-Patterns -->
+    <h3>8.2 OSINT Investigation Anti-Patterns</h3>
+    <div class="anti-pattern-grid">
+      <div class="callout-warning">
+        <div class="callout-title">&#128683; Anti-Pattern: The Aggregator Trap</div>
+        <p>Paying $30/month for a commercial data broker subscription when free public records — PACER, Companies House, SEC EDGAR, JudyRecords, NSOPW — would provide more accurate, authoritative information at zero cost. Data brokers are convenience tools, not primary sources. The most important OSINT resources are free.</p>
+      </div>
+      <div class="callout-warning">
+        <div class="callout-title">&#128683; Anti-Pattern: The Social Media Shortcut</div>
+        <p>Assuming that finding a matching Facebook or LinkedIn profile constitutes identity verification without cross-referencing additional independent data points. Social media profiles are easy to fake, modify, or abandon. Always triangulate social media findings with address records, phone records, or public record databases before treating a social profile as confirmed identity.</p>
+      </div>
+      <div class="callout-warning">
+        <div class="callout-title">&#128683; Anti-Pattern: The FCRA Time Bomb</div>
+        <p>Using non-FCRA consumer data (BeenVerified, TruthFinder, Intelius, Instant Checkmate, Spokeo) to make or influence adverse employment or housing decisions. One complaint to the CFPB (Consumer Financial Protection Bureau) can trigger an FTC investigation. The statutory damages of $100–$1,000 per violation apply to each individual affected — not to the company as a whole. Class actions have been successfully prosecuted for this exact violation.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SECTION 9: FINAL RECOMMENDATIONS MATRIX -->
+  <!-- ============================================================ -->
+  <section id="section9">
+    <div class="section-divider"></div>
+    <h2>9. Final Recommendations Matrix</h2>
+
+    <!-- 9.1 By Investigation Type -->
+    <h3 id="s9-1">9.1 By Investigation Type</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Investigation Type</th>
+            <th>Free First Step</th>
+            <th>Paid Upgrade</th>
+            <th>Professional Tool</th>
+            <th>Avoid For Employment?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>People search (US)</strong></td>
+            <td>TruePeopleSearch + ZabaSearch + That's Them</td>
+            <td>BeenVerified ($1 trial → $17/mo)</td>
+            <td>TruthFinder (investigative depth)</td>
+            <td class="no-fcra">All non-FCRA tools</td>
+          </tr>
+          <tr>
+            <td><strong>People search (UK)</strong></td>
+            <td>192.com (20 free/day) + BT Phonebook</td>
+            <td>192.com credits (Electoral Roll premium)</td>
+            <td>Companies House + 192.com combined</td>
+            <td class="na-fcra">N/A (UK GDPR applies)</td>
+          </tr>
+          <tr>
+            <td><strong>Background check (personal)</strong></td>
+            <td>JudyRecords + NSOPW + PACER</td>
+            <td>BeenVerified or Instant Checkmate</td>
+            <td>Instant Checkmate (criminal record depth)</td>
+            <td class="no-fcra">All consumer tools</td>
+          </tr>
+          <tr>
+            <td><strong>Background check (employment)</strong></td>
+            <td>N/A — FCRA-compliant CRA required</td>
+            <td>N/A — see professional column</td>
+            <td>Checkr / Sterling / HireRight</td>
+            <td class="no-fcra">All non-FCRA tools (mandatory)</td>
+          </tr>
+          <tr>
+            <td><strong>Company due diligence</strong></td>
+            <td>OpenCorporates + Companies House + OpenSanctions</td>
+            <td>Endole (UK) / Dun &amp; Bradstreet (global)</td>
+            <td>Maltego + OCCRP Aleph</td>
+            <td class="na-fcra">N/A</td>
+          </tr>
+          <tr>
+            <td><strong>Domain / infra recon</strong></td>
+            <td>OSINT_AI_Agent (open-source) + Shodan free tier</td>
+            <td>SpiderFoot HX</td>
+            <td>Maltego + ShadowDragon</td>
+            <td class="na-fcra">N/A</td>
+          </tr>
+          <tr>
+            <td><strong>Evidence preservation</strong></td>
+            <td>Hunchly (free trial) + browser screenshots</td>
+            <td>Hunchly (annual subscription)</td>
+            <td>Hunchly + PACER (certified copies)</td>
+            <td class="na-fcra">N/A</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 9.2 By Budget -->
+    <h3 id="s9-2">9.2 By Budget</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Budget</th>
+            <th>Best Free Tools</th>
+            <th>Best Paid Tools</th>
+            <th>GitHub Resources</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>$0 — Free only</strong></td>
+            <td>TruePeopleSearch, JudyRecords, NSOPW, OpenCorporates, OpenSanctions, PACER, EDGAR, OCCRP Aleph, 192.com (20/day)</td>
+            <td>—</td>
+            <td>People-Search-OSINT, Company-Business-OSINT, Coeus-OSINT-ToolBox, awesome-osint</td>
+          </tr>
+          <tr>
+            <td><strong>&lt;$30/month</strong></td>
+            <td>All above free tools</td>
+            <td>BeenVerified ($17/mo quarterly)</td>
+            <td>All above + OSINT_AI_Agent (API costs separate)</td>
+          </tr>
+          <tr>
+            <td><strong>$30–$100/month</strong></td>
+            <td>All above free tools</td>
+            <td>TruthFinder + Instant Checkmate</td>
+            <td>SpiderFoot (self-hosted, free) + paid API keys (Shodan, Hunter.io)</td>
+          </tr>
+          <tr>
+            <td><strong>$100+/month</strong></td>
+            <td>All above free tools</td>
+            <td>Maltego Professional, Hunchly annual, Dun &amp; Bradstreet reports</td>
+            <td>Full AI pipeline: LangGraph + OpenAI/Claude + commercial data APIs</td>
+          </tr>
+          <tr>
+            <td><strong>Enterprise</strong></td>
+            <td>All above free tools</td>
+            <td>ShadowDragon, Maltego Enterprise, SEON, D&amp;B full platform</td>
+            <td>Custom multi-agent pipeline; dedicated OSINT infrastructure</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 9.3 Tool Scoring Matrix -->
+    <h3 id="s9-3">9.3 Tool Scoring Matrix</h3>
+    <p class="text-muted text-small">Ratings are 1–5 stars (&#9733; = 1, &#9733;&#9733;&#9733;&#9733;&#9733; = 5). Scores reflect typical investigative use; individual results may vary. N/A = not applicable for that dimension.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Accuracy</th>
+            <th>Depth</th>
+            <th>Ease of Use</th>
+            <th>Legal Safety</th>
+            <th>Value</th>
+            <th>Overall</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>BeenVerified</strong></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span></span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span></span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span><span class="star-empty">&#9733;</span></span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span></span></td>
+            <td class="score-mid"><strong>4.0</strong></td>
+          </tr>
+          <tr>
+            <td><strong>TruthFinder</strong></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span></span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span><span class="star-empty">&#9733;</span></span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span><span class="star-empty">&#9733;</span></span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span><span class="star-empty">&#9733;</span></span></td>
+            <td class="score-mid"><strong>3.6</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Intelius</strong></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span><span class="star-empty">&#9733;</span></span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span></span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span><span class="star-empty">&#9733;</span></span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span><span class="star-empty">&#9733;</span></span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span><span class="star-empty">&#9733;</span></span></td>
+            <td class="score-mid"><strong>3.2</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Instant Checkmate</strong></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span></span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span></span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span><span class="star-empty">&#9733;</span></span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span><span class="star-empty">&#9733;</span></span></td>
+            <td class="score-mid"><strong>3.8</strong></td>
+          </tr>
+          <tr>
+            <td><strong>192.com</strong></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span><span class="star-empty">&#9733;</span></span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span></span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+            <td class="score-high"><strong>4.4</strong></td>
+          </tr>
+          <tr>
+            <td><strong>OpenCorporates</strong></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span></span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span></span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+            <td class="score-high"><strong>4.6</strong></td>
+          </tr>
+          <tr>
+            <td><strong>OCCRP Aleph</strong></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span></span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span><span class="star-empty">&#9733;</span></span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span></span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+            <td class="score-high"><strong>4.2</strong></td>
+          </tr>
+          <tr>
+            <td><strong>OpenSanctions</strong></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span></span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+            <td class="score-high"><strong>4.8</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Maltego</strong></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span><span class="star-empty">&#9733;</span></span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span><span class="star-empty">&#9733;</span></span></td>
+            <td class="score-high"><strong>4.2</strong></td>
+          </tr>
+          <tr>
+            <td><strong>PACER</strong></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span><span class="star-empty">&#9733;</span></span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+            <td class="score-high"><strong>4.6</strong></td>
+          </tr>
+          <tr>
+            <td><strong>People-Search-OSINT (GitHub)</strong></td>
+            <td><span class="text-muted">N/A</span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span></span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+            <td class="score-high"><strong>4.6</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Coeus-OSINT-ToolBox (GitHub)</strong></td>
+            <td><span class="text-muted">N/A</span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span></span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span><span class="star-empty">&#9733;</span></span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span></span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+            <td class="score-high"><strong>4.2</strong></td>
+          </tr>
+          <tr>
+            <td><strong>OSINT_AI_Agent (GitHub)</strong></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span></span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span></span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;<span class="star-empty">&#9733;</span><span class="star-empty">&#9733;</span></span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+            <td><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span></td>
+            <td class="score-high"><strong>4.2</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout-tip">
+      <div class="callout-title">&#128204; Top Recommendations Summary</div>
+      <ul>
+        <li><strong>Highest overall score:</strong> OpenSanctions (4.8) — free, authoritative, and legally safe for all use cases</li>
+        <li><strong>Best free all-around:</strong> OpenCorporates + PACER + JudyRecords combination</li>
+        <li><strong>Best paid people search:</strong> BeenVerified (best value) or TruthFinder (deepest reports)</li>
+        <li><strong>Employment background checks:</strong> Checkr or Sterling — no exceptions</li>
+        <li><strong>UK investigations:</strong> 192.com + Companies House — free, authoritative, GDPR-aware</li>
+        <li><strong>Professional investigators:</strong> Maltego for visual link analysis; OCCRP Aleph for investigative depth</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- FOOTER -->
+  <!-- ============================================================ -->
+  <footer class="report-footer">
+    <div class="callout-warning" style="margin-bottom:20px;">
+      <div class="callout-title">&#9888; Legal Disclaimer</div>
+      <p>This report is for informational purposes only. Always verify information through primary sources before taking action. Comply with all applicable laws including the Fair Credit Reporting Act (FCRA), General Data Protection Regulation (GDPR), California Consumer Privacy Act (CCPA), and Computer Fraud and Abuse Act (CFAA). Data from third-party aggregators may be inaccurate or outdated. The author assumes no liability for misuse of this information.</p>
+    </div>
+    <p><strong>Copyright &copy; 2026 Perplexity Computer.</strong> All rights reserved.</p>
+    <p style="margin-top:8px;"><strong>Sources &amp; References:</strong></p>
+    <ul style="margin: 6px 0 0 18px; line-height: 1.8;">
+      <li>FTC.gov — FCRA guidance: <a href="https://www.ftc.gov/business-guidance/resources/what-employment-background-screening-companies-need-know-about-fair-credit-reporting-act" target="_blank">ftc.gov/business-guidance/resources/...</a></li>
+      <li>BeenVerified: <a href="https://www.beenverified.com" target="_blank">beenverified.com</a></li>
+      <li>Intelius: <a href="https://www.intelius.com" target="_blank">intelius.com</a></li>
+      <li>TruthFinder: <a href="https://www.truthfinder.com" target="_blank">truthfinder.com</a></li>
+      <li>Instant Checkmate: <a href="https://www.instantcheckmate.com" target="_blank">instantcheckmate.com</a></li>
+      <li>192.com (UK): <a href="https://www.192.com" target="_blank">192.com</a></li>
+      <li>OpenCorporates: <a href="https://opencorporates.com" target="_blank">opencorporates.com</a></li>
+      <li>OCCRP Aleph: <a href="https://aleph.occrp.org" target="_blank">aleph.occrp.org</a></li>
+      <li>OpenSanctions: <a href="https://www.opensanctions.org" target="_blank">opensanctions.org</a></li>
+      <li>PACER — US Federal Courts: <a href="https://pacer.uscourts.gov" target="_blank">pacer.uscourts.gov</a></li>
+      <li>Companies House (UK): <a href="https://find-and-update.company-information.service.gov.uk" target="_blank">find-and-update.company-information.service.gov.uk</a></li>
+      <li>SEC EDGAR: <a href="https://www.sec.gov/edgar" target="_blank">sec.gov/edgar</a></li>
+      <li>JudyRecords: <a href="https://www.judyrecords.com" target="_blank">judyrecords.com</a></li>
+      <li>NSOPW — National Sex Offender Public Website: <a href="https://www.nsopw.gov" target="_blank">nsopw.gov</a></li>
+      <li>Maltego: <a href="https://www.maltego.com" target="_blank">maltego.com</a></li>
+      <li>GitHub — The-Osint-Toolbox/People-Search-OSINT: <a href="https://github.com/The-Osint-Toolbox/People-Search-OSINT" target="_blank">github.com/The-Osint-Toolbox/People-Search-OSINT</a></li>
+      <li>GitHub — AnonCatalyst/Coeus-OSINT-ToolBox: <a href="https://github.com/AnonCatalyst/Coeus-OSINT-ToolBox" target="_blank">github.com/AnonCatalyst/Coeus-OSINT-ToolBox</a></li>
+      <li>GitHub — dazzyddos/OSINT_AI_Agent: <a href="https://github.com/dazzyddos/OSINT_AI_Agent" target="_blank">github.com/dazzyddos/OSINT_AI_Agent</a></li>
+    </ul>
+  </footer>
+
+</main>
+</body>
+</html>

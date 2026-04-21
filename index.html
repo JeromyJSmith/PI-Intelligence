@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PI Due Diligence Hub — OSINT, People Search &amp; Background Checks</title>
+  <meta name="description" content="A practitioner's resource hub for PI-adjacent due diligence: OSINT workflows, people search tools, regulatory databases, background checks, and automation pipelines." />
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=zodiak@400,700&display=swap" rel="stylesheet" />
+  <style>
+    /* ===== DESIGN TOKENS ===== */
+    :root {
+      --color-bg:          #F7F6F2;
+      --color-surface:     #F9F8F5;
+      --color-surface-2:   #FBFBF9;
+      --color-surface-off: #F3F0EC;
+      --color-border:      #D4D1CA;
+      --color-divider:     #DCD9D5;
+      --color-text:        #28251D;
+      --color-muted:       #66635D;
+      --color-faint:       #9A9892;
+      --color-inverse:     #F9F8F4;
+      --color-primary:     #01696F;
+      --color-primary-dk:  #015459;
+      --color-primary-lt:  #E0F4F4;
+      --color-warning:     #964219;
+      --color-warning-lt:  #FFF4E8;
+      --color-danger:      #A12C7B;
+      --color-green:       #437A22;
+      --shadow-sm:  0 1px 3px rgba(0,0,0,.06);
+      --shadow-md:  0 6px 20px rgba(0,0,0,.09);
+      --shadow-lg:  0 12px 40px rgba(0,0,0,.12);
+      --radius-sm:  .375rem;
+      --radius-md:  .625rem;
+      --radius-lg:  1rem;
+      --radius-xl:  1.5rem;
+      --font-body:  'Satoshi', -apple-system, 'Segoe UI', Arial, sans-serif;
+      --font-disp:  'Zodiak', Georgia, serif;
+      --max-w: 1160px;
+    }
+    [data-theme="dark"] {
+      --color-bg:          #171614;
+      --color-surface:     #1C1B19;
+      --color-surface-2:   #201F1D;
+      --color-surface-off: #22211F;
+      --color-border:      #393836;
+      --color-divider:     #262523;
+      --color-text:        #E2E0DB;
+      --color-muted:       #B0AEA8;
+      --color-faint:       #86847E;
+      --color-inverse:     #2B2A28;
+      --color-primary:     #4F98A3;
+      --color-primary-dk:  #227F8B;
+      --color-primary-lt:  #0E2E32;
+      --color-warning:     #BB653B;
+      --color-warning-lt:  #2A1A08;
+      --shadow-sm:  0 1px 3px rgba(0,0,0,.24);
+      --shadow-md:  0 6px 20px rgba(0,0,0,.36);
+    }
+
+    /* ===== RESET ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      font-family: var(--font-body);
+      background: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.65;
+      min-height: 100vh;
+    }
+    a { color: var(--color-primary); }
+    a:hover { color: var(--color-primary-dk); }
+    img, svg { max-width: 100%; display: block; }
+    button { font: inherit; cursor: pointer; }
+
+    /* ===== LAYOUT ===== */
+    .container { width: min(calc(100% - 2.5rem), var(--max-w)); margin-inline: auto; }
+
+    /* ===== NAV ===== */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: color-mix(in srgb, var(--color-bg) 88%, transparent);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--color-divider);
+    }
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      padding: 1rem 0;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      text-decoration: none;
+      color: inherit;
+      flex-shrink: 0;
+    }
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--color-primary);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .brand-icon svg { width: 20px; height: 20px; color: white; }
+    .brand-text .name { font-weight: 700; font-size: .95rem; letter-spacing: .01em; }
+    .brand-text .sub  { font-size: .72rem; color: var(--color-muted); letter-spacing: .02em; }
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--color-muted);
+      font-size: .875rem;
+      font-weight: 500;
+      transition: color .15s;
+    }
+    .nav-links a:hover { color: var(--color-primary); }
+    .nav-actions { display: flex; gap: .75rem; align-items: center; }
+    .btn-theme {
+      background: transparent;
+      border: 1px solid var(--color-border);
+      border-radius: 999px;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-muted);
+      font-size: 1rem;
+      transition: background .15s, border-color .15s;
+    }
+    .btn-theme:hover { background: var(--color-surface); border-color: var(--color-primary); color: var(--color-primary); }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      padding: .55rem 1.1rem;
+      border-radius: 999px;
+      font-size: .875rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background .15s, box-shadow .15s, transform .1s;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary {
+      background: var(--color-primary);
+      color: var(--color-inverse);
+      border-color: var(--color-primary);
+      box-shadow: 0 2px 8px rgba(1,105,111,.25);
+    }
+    .btn-primary:hover { background: var(--color-primary-dk); border-color: var(--color-primary-dk); color: var(--color-inverse); }
+    .btn-outline {
+      background: var(--color-surface);
+      color: var(--color-text);
+      border-color: var(--color-border);
+      box-shadow: var(--shadow-sm);
+    }
+    .btn-outline:hover { background: var(--color-bg); color: var(--color-primary); border-color: var(--color-primary); }
+
+    /* ===== HERO ===== */
+    .hero {
+      padding: clamp(3.5rem, 9vw, 7rem) 0 clamp(2rem, 5vw, 4rem);
+    }
+    .hero-inner {
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 2.5rem;
+      align-items: start;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--color-primary);
+      background: var(--color-primary-lt);
+      padding: .3rem .75rem;
+      border-radius: 999px;
+      margin-bottom: 1.25rem;
+    }
+    h1 {
+      font-family: var(--font-disp);
+      font-size: clamp(2.1rem, 4.5vw, 3.4rem);
+      line-height: 1.07;
+      letter-spacing: -.01em;
+      margin-bottom: .9rem;
+      max-width: 14ch;
+    }
+    .hero-lead {
+      font-size: clamp(1rem, 1.5vw, 1.15rem);
+      color: var(--color-muted);
+      max-width: 52ch;
+      margin-bottom: 1.75rem;
+    }
+    .hero-actions { display: flex; gap: .75rem; flex-wrap: wrap; }
+    .hero-panel {
+      background: linear-gradient(160deg, var(--color-surface), var(--color-surface-off));
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: 1.4rem 1.6rem;
+      box-shadow: var(--shadow-md);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-panel::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--color-primary), #4F98A3);
+    }
+    .panel-label {
+      font-size: .7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--color-primary);
+      margin-bottom: 1rem;
+      padding-bottom: .75rem;
+      border-bottom: 1px solid var(--color-divider);
+    }
+    .panel-stat {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: .65rem 0;
+      border-bottom: 1px solid var(--color-divider);
+    }
+    .panel-stat:last-child { border-bottom: none; }
+    .panel-stat-key { font-size: .875rem; font-weight: 600; }
+    .panel-stat-val { font-size: .82rem; color: var(--color-muted); text-align: right; max-width: 20ch; }
+
+    /* ===== STAT STRIP ===== */
+    .stats-strip {
+      background: var(--color-primary);
+      padding: 1.5rem 0;
+    }
+    .stats-inner {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      text-align: center;
+    }
+    .stat-item { color: white; }
+    .stat-num {
+      font-family: var(--font-disp);
+      font-size: clamp(1.75rem, 3vw, 2.5rem);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -.01em;
+    }
+    .stat-lbl {
+      font-size: .78rem;
+      opacity: .75;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      margin-top: .2rem;
+    }
+
+    /* ===== SECTION HEADINGS ===== */
+    .section { padding: clamp(2.5rem, 6vw, 5rem) 0; }
+    .section-head { margin-bottom: 2.5rem; }
+    .section-eye {
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--color-primary);
+      margin-bottom: .5rem;
+    }
+    h2 {
+      font-family: var(--font-disp);
+      font-size: clamp(1.6rem, 3vw, 2.3rem);
+      line-height: 1.1;
+      margin-bottom: .65rem;
+    }
+    .section-sub { color: var(--color-muted); max-width: 56ch; font-size: 1.025rem; }
+
+    /* ===== REPORT CARDS ===== */
+    .reports-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.5rem;
+    }
+    .report-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      transition: box-shadow .2s, transform .2s;
+    }
+    .report-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .report-card-header {
+      background: var(--color-primary);
+      color: white;
+      padding: 1.5rem 1.75rem 1.25rem;
+      position: relative;
+    }
+    .report-card-header.accent-amber { background: linear-gradient(135deg, #7A4A1E, var(--color-warning)); }
+    .report-card-tag {
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      opacity: .75;
+      margin-bottom: .5rem;
+    }
+    .report-card-title {
+      font-family: var(--font-disp);
+      font-size: 1.35rem;
+      line-height: 1.2;
+      font-weight: 700;
+      margin-bottom: .5rem;
+    }
+    .report-card-subtitle { font-size: .875rem; opacity: .85; }
+    .report-card-icon {
+      position: absolute;
+      top: 1.25rem;
+      right: 1.5rem;
+      width: 48px;
+      height: 48px;
+      background: rgba(255,255,255,.15);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .report-card-icon svg { width: 26px; height: 26px; color: white; }
+    .report-card-body {
+      padding: 1.5rem 1.75rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .report-card-desc { font-size: .9rem; color: var(--color-muted); line-height: 1.6; }
+    .tag-row { display: flex; flex-wrap: wrap; gap: .4rem; }
+    .tag {
+      display: inline-block;
+      padding: .22rem .6rem;
+      background: var(--color-surface-off);
+      border: 1px solid var(--color-border);
+      border-radius: 999px;
+      font-size: .72rem;
+      font-weight: 600;
+      color: var(--color-muted);
+      letter-spacing: .03em;
+    }
+    .tag.green { background: #EDF5E7; color: var(--color-green); border-color: #C3DDB5; }
+    .tag.teal  { background: var(--color-primary-lt); color: var(--color-primary); border-color: #A7D9DB; }
+    .report-card-footer {
+      padding: 1rem 1.75rem 1.5rem;
+      border-top: 1px solid var(--color-divider);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .card-meta-text { font-size: .78rem; color: var(--color-faint); }
+
+    /* ===== PIPELINE SECTION ===== */
+    .pipeline-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: .75rem;
+      counter-reset: step;
+    }
+    .pipeline-step {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 1.1rem 1rem;
+      position: relative;
+      counter-increment: step;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+    }
+    .pipeline-step::before {
+      content: counter(step);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      background: var(--color-primary);
+      color: white;
+      border-radius: 50%;
+      font-size: .78rem;
+      font-weight: 700;
+      margin: 0 auto .6rem;
+    }
+    .pipeline-step-title { font-size: .82rem; font-weight: 700; color: var(--color-text); margin-bottom: .35rem; }
+    .pipeline-step-desc  { font-size: .75rem; color: var(--color-muted); line-height: 1.5; }
+    .pipeline-arrow {
+      display: none; /* shown via CSS on wider screens */
+    }
+
+    /* ===== FEATURES ===== */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.25rem;
+    }
+    .feature-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 1.4rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .feature-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--color-primary-lt);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: .9rem;
+      color: var(--color-primary);
+    }
+    .feature-icon svg { width: 20px; height: 20px; }
+    .feature-title { font-size: .95rem; font-weight: 700; margin-bottom: .4rem; }
+    .feature-desc  { font-size: .85rem; color: var(--color-muted); line-height: 1.6; }
+
+    /* ===== RESOURCE TABLE SECTION ===== */
+    .resource-table-wrap { overflow-x: auto; }
+    .resource-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      font-size: .875rem;
+    }
+    .resource-table thead th {
+      background: var(--color-primary);
+      color: white;
+      padding: .75rem 1rem;
+      text-align: left;
+      font-weight: 600;
+      font-size: .8rem;
+      letter-spacing: .03em;
+      white-space: nowrap;
+    }
+    .resource-table tbody tr:nth-child(odd)  { background: var(--color-bg); }
+    .resource-table tbody tr:nth-child(even) { background: var(--color-surface-2); }
+    .resource-table tbody tr:hover { background: var(--color-primary-lt); }
+    .resource-table td {
+      padding: .75rem 1rem;
+      border-bottom: 1px solid var(--color-divider);
+      vertical-align: top;
+      line-height: 1.5;
+    }
+    .resource-table td a { color: var(--color-primary); text-decoration: none; font-weight: 500; }
+    .resource-table td a:hover { text-decoration: underline; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: .2rem .55rem;
+      border-radius: 999px;
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .badge-free     { background: #EDF5E7; color: #437A22; border: 1px solid #C3DDB5; }
+    .badge-freemium { background: #FFF4E8; color: #964219; border: 1px solid #F0CBB0; }
+    .badge-paid     { background: #FBF0F3; color: #A13544; border: 1px solid #E5B0BB; }
+
+    /* ===== CTA ===== */
+    .cta-section {
+      background: var(--color-primary);
+      padding: clamp(2.5rem, 5vw, 4rem) 0;
+      text-align: center;
+    }
+    .cta-inner { max-width: 56ch; margin: 0 auto; }
+    .cta-section h2 { font-family: var(--font-disp); font-size: clamp(1.6rem, 3vw, 2.2rem); color: white; margin-bottom: .75rem; }
+    .cta-section p  { color: rgba(255,255,255,.8); font-size: 1.05rem; margin-bottom: 1.75rem; }
+    .cta-actions { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; }
+    .btn-white {
+      background: white;
+      color: var(--color-primary);
+      border: 1px solid transparent;
+      box-shadow: 0 2px 10px rgba(0,0,0,.12);
+    }
+    .btn-white:hover { background: var(--color-bg); color: var(--color-primary-dk); }
+    .btn-ghost-white {
+      background: rgba(255,255,255,.12);
+      color: white;
+      border: 1px solid rgba(255,255,255,.3);
+    }
+    .btn-ghost-white:hover { background: rgba(255,255,255,.2); color: white; }
+
+    /* ===== FOOTER ===== */
+    footer {
+      background: var(--color-surface);
+      border-top: 1px solid var(--color-border);
+      padding: 2.5rem 0;
+    }
+    .footer-inner {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    .footer-brand .brand { margin-bottom: .75rem; }
+    .footer-brand p { font-size: .85rem; color: var(--color-muted); max-width: 36ch; line-height: 1.6; }
+    .footer-col h4 { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--color-faint); margin-bottom: .9rem; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: .4rem; }
+    .footer-col a { text-decoration: none; font-size: .875rem; color: var(--color-muted); transition: color .15s; }
+    .footer-col a:hover { color: var(--color-primary); }
+    .footer-bottom {
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--color-divider);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      font-size: .8rem;
+      color: var(--color-faint);
+      flex-wrap: wrap;
+    }
+    .footer-bottom a { color: var(--color-muted); text-decoration: none; }
+    .footer-bottom a:hover { color: var(--color-primary); }
+
+    /* ===== DIVIDER RULE ===== */
+    .rule {
+      height: 2px;
+      background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-border) 100%);
+      border: none;
+      border-radius: 1px;
+      margin: 0;
+    }
+
+    /* ===== CALLOUT ===== */
+    .callout {
+      display: flex;
+      gap: 1rem;
+      border-left: 3px solid var(--color-primary);
+      background: var(--color-primary-lt);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: 1rem 1.25rem;
+      margin: 1.5rem 0;
+    }
+    .callout-body { font-size: .9rem; color: var(--color-text); }
+    .callout-body strong { color: var(--color-primary); }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      .hero-inner, .reports-grid, .footer-inner, .features-grid { grid-template-columns: 1fr; }
+      .pipeline-grid { grid-template-columns: repeat(2, 1fr); }
+      .stats-inner { grid-template-columns: repeat(2, 1fr); }
+      .nav-links { display: none; }
+    }
+    @media (max-width: 600px) {
+      .pipeline-grid { grid-template-columns: 1fr; }
+      .stats-inner { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ===== SKIP LINK ===== */
+    .skip { position: absolute; left: -9999px; }
+    .skip:focus { left: 1rem; top: 1rem; background: var(--color-surface); padding: .5rem 1rem; border-radius: .5rem; z-index: 999; }
+  </style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- ===== NAVIGATION ===== -->
+<header>
+  <div class="container nav">
+    <a class="brand" href="#top" aria-label="PI Due Diligence Hub">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <div class="name">PI Due Diligence Hub</div>
+        <div class="sub">OSINT · People Search · Background Checks</div>
+      </div>
+    </a>
+
+    <nav aria-label="Primary navigation">
+      <ul class="nav-links">
+        <li><a href="#reports">Reports</a></li>
+        <li><a href="#pipeline">Pipeline</a></li>
+        <li><a href="#resources">Resources</a></li>
+        <li><a href="#features">Capabilities</a></li>
+      </ul>
+    </nav>
+
+    <div class="nav-actions">
+      <button class="btn-theme" id="themeToggle" aria-label="Toggle dark mode" type="button">◐</button>
+      <a class="btn btn-primary" href="osint-report.html">Open Report</a>
+    </div>
+  </div>
+</header>
+
+<!-- ===== MAIN ===== -->
+<main id="main">
+
+  <!-- HERO -->
+  <section class="hero container" id="top">
+    <div class="hero-inner">
+      <div>
+        <span class="eyebrow">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><circle cx="5" cy="5" r="5"/></svg>
+          Practitioner Resource Hub · April 2026
+        </span>
+        <h1>Rigorous Due Diligence Without a PI</h1>
+        <p class="hero-lead">A layered playbook for vetting investment managers, counterparties, operators, and associates — using regulatory databases, PACER, OSINT tooling, and automation pipelines.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="osint-report.html">OSINT Intelligence Report</a>
+          <a class="btn btn-outline" href="due-diligence.html">Due Diligence Guide</a>
+        </div>
+      </div>
+
+      <aside class="hero-panel" aria-label="What this hub covers">
+        <div class="panel-label">Coverage scope</div>
+        <div class="panel-stat">
+          <span class="panel-stat-key">Regulatory</span>
+          <span class="panel-stat-val">IAPD, SEC actions, FINRA disclosures</span>
+        </div>
+        <div class="panel-stat">
+          <span class="panel-stat-key">Federal Courts</span>
+          <span class="panel-stat-val">PACER civil, bankruptcy &amp; appellate</span>
+        </div>
+        <div class="panel-stat">
+          <span class="panel-stat-key">People Search</span>
+          <span class="panel-stat-val">Aliases, associates, entities, social</span>
+        </div>
+        <div class="panel-stat">
+          <span class="panel-stat-key">Automation</span>
+          <span class="panel-stat-val">Case management, agent skills, GitHub</span>
+        </div>
+        <div class="panel-stat">
+          <span class="panel-stat-key">Legal Framework</span>
+          <span class="panel-stat-val">FCRA, GDPR, CCPA compliance</span>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- STAT STRIP -->
+  <div class="stats-strip">
+    <div class="container">
+      <div class="stats-inner">
+        <div class="stat-item">
+          <div class="stat-num">9</div>
+          <div class="stat-lbl">Report Sections</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">40+</div>
+          <div class="stat-lbl">Tools Reviewed</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">5</div>
+          <div class="stat-lbl">Pipeline Stages</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">3</div>
+          <div class="stat-lbl">Legal Frameworks</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REPORTS -->
+  <section class="section container" id="reports">
+    <div class="section-head">
+      <div class="section-eye">Documents</div>
+      <h2>Core Reference Reports</h2>
+      <p class="section-sub">Two complementary documents — a deep-dive intelligence report and an operational workflow guide — covering the full due diligence stack.</p>
+    </div>
+
+    <div class="reports-grid">
+      <!-- OSINT Report Card -->
+      <article class="report-card">
+        <div class="report-card-header">
+          <div class="report-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+            </svg>
+          </div>
+          <div class="report-card-tag">Intelligence Report · 9 Sections</div>
+          <div class="report-card-title">OSINT Intelligence Report</div>
+          <div class="report-card-subtitle">People Search, Due Diligence &amp; Background Checks</div>
+        </div>
+        <div class="report-card-body">
+          <p class="report-card-desc">A comprehensive review of the full OSINT landscape — paid data brokers, free public record tools, AI-powered investigation agents, GitHub toolboxes, and step-by-step investigative workflows for each use case, with legal compliance guidance throughout.</p>
+          <div class="tag-row">
+            <span class="tag teal">FCRA Compliance</span>
+            <span class="tag teal">GDPR</span>
+            <span class="tag teal">People Search</span>
+            <span class="tag teal">Company Due Diligence</span>
+            <span class="tag teal">AI Agents</span>
+            <span class="tag teal">GitHub Toolboxes</span>
+          </div>
+        </div>
+        <div class="report-card-footer">
+          <span class="card-meta-text">April 2026 · v1.0</span>
+          <a class="btn btn-primary" href="osint-report.html">Read Report →</a>
+        </div>
+      </article>
+
+      <!-- Due Diligence Guide Card -->
+      <article class="report-card">
+        <div class="report-card-header accent-amber">
+          <div class="report-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+            </svg>
+          </div>
+          <div class="report-card-tag">Operational Guide · 5 Phases</div>
+          <div class="report-card-title">Rigorous Due Diligence Guide</div>
+          <div class="report-card-subtitle">PI-Adjacent Workflow &amp; Automation Roadmap</div>
+        </div>
+        <div class="report-card-body">
+          <p class="report-card-desc">A practical, phase-by-phase operational playbook for vetting investment managers, counterparties, and associated entities using public records, regulator databases, court systems, and OSINT workflows — including an automation roadmap and agent skill packaging guidance.</p>
+          <div class="tag-row">
+            <span class="tag green">IAPD / SEC</span>
+            <span class="tag green">FINRA</span>
+            <span class="tag green">PACER</span>
+            <span class="tag green">Alias Expansion</span>
+            <span class="tag green">Automation</span>
+            <span class="tag green">skills.sh</span>
+          </div>
+        </div>
+        <div class="report-card-footer">
+          <span class="card-meta-text">April 2026 · Operational</span>
+          <a class="btn btn-outline" href="due-diligence.html" style="border-color: var(--color-warning); color: var(--color-warning);">Open Guide →</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- PIPELINE -->
+  <section class="section" id="pipeline" style="background: var(--color-surface); border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-eye">Methodology</div>
+        <h2>The 5-Stage Diligence Pipeline</h2>
+        <p class="section-sub">A repeatable, layered process that moves from intake normalization through to a documented decision memo — verified at each stage.</p>
+      </div>
+      <div class="pipeline-grid">
+        <div class="pipeline-step">
+          <div class="pipeline-step-title">Intake &amp; Normalize</div>
+          <div class="pipeline-step-desc">Collect legal name, aliases, DOB, locations, firms, and known associates. Build canonical case record.</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-step-title">Regulator Pass</div>
+          <div class="pipeline-step-desc">IAPD, SEC enforcement, FINRA disclosure framework. High-signal structured records checked first.</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-step-title">Federal Court Pass</div>
+          <div class="pipeline-step-desc">PACER Case Locator — civil, bankruptcy, appellate. Search individual and all tied entities.</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-step-title">Alias &amp; Associate Expansion</div>
+          <div class="pipeline-step-desc">Name variants, prior addresses, domains, usernames. People-search as lead generator — verify in primary sources.</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-step-title">Evidence &amp; Decision Memo</div>
+          <div class="pipeline-step-desc">Classify by severity and confidence. Separate allegations from findings. Produce a final decision memo.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESOURCES TABLE -->
+  <section class="section container" id="resources">
+    <div class="section-head">
+      <div class="section-eye">Priority Resources</div>
+      <h2>Key Databases &amp; Platforms</h2>
+      <p class="section-sub">The highest-signal resources, organized by category, cost, and role in the pipeline.</p>
+    </div>
+
+    <div class="resource-table-wrap">
+      <table class="resource-table" aria-label="Priority resources">
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Resource</th>
+            <th>Cost</th>
+            <th>Pipeline Role</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Adviser checks</strong></td>
+            <td><a href="https://adviserinfo.sec.gov" target="_blank" rel="noopener">IAPD / adviserinfo.sec.gov</a></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>Confirm adviser registration, disclosures, and firm identity</td>
+          </tr>
+          <tr>
+            <td><strong>SEC enforcement</strong></td>
+            <td><a href="https://www.sec.gov/litigation/litreleases.shtml" target="_blank" rel="noopener">SEC Action Lookup &amp; Litigation Releases</a></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>Identify enforcement actions and related litigation history</td>
+          </tr>
+          <tr>
+            <td><strong>Broker history</strong></td>
+            <td><a href="https://brokercheck.finra.org" target="_blank" rel="noopener">FINRA BrokerCheck</a></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>Reportable events: complaints, judgments, liens, bankruptcies</td>
+          </tr>
+          <tr>
+            <td><strong>Federal litigation</strong></td>
+            <td><a href="https://pcl.uscourts.gov" target="_blank" rel="noopener">PACER Case Locator</a></td>
+            <td><span class="badge badge-freemium">Freemium</span></td>
+            <td>Civil, bankruptcy, and appellate records nationwide</td>
+          </tr>
+          <tr>
+            <td><strong>People search</strong></td>
+            <td>BeenVerified, TruthFinder, Intelius, Instant Checkmate</td>
+            <td><span class="badge badge-paid">Paid</span></td>
+            <td>Lead generation for aliases, addresses, associates — not final proof</td>
+          </tr>
+          <tr>
+            <td><strong>Company records</strong></td>
+            <td><a href="https://aleph.occrp.org" target="_blank" rel="noopener">OCCRP Aleph</a> · <a href="https://opencorporates.com" target="_blank" rel="noopener">OpenCorporates</a></td>
+            <td><span class="badge badge-free">Free</span></td>
+            <td>Cross-border entity links, beneficial ownership, sanctions</td>
+          </tr>
+          <tr>
+            <td><strong>OSINT investigation</strong></td>
+            <td>Miessler investigation skills · LangGraph OSINT agents</td>
+            <td><span class="badge badge-free">Open Source</span></td>
+            <td>Reusable structures for person lookup, company intel, evidence handling</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout" style="margin-top: 1.5rem;">
+      <div class="callout-body">
+        <strong>Operating principle:</strong> No single database is sufficient. Cross-check every material finding across at least two independent source types — for example, IAPD plus SEC enforcement, or a people-search hit plus PACER and public web corroboration.
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="section container" id="features">
+    <div class="section-head">
+      <div class="section-eye">Capabilities</div>
+      <h2>What the Hub Covers</h2>
+      <p class="section-sub">Six core capability areas addressed in the full reports — from legal compliance to AI-powered automation.</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <div class="feature-title">Legal Compliance</div>
+        <div class="feature-desc">FCRA, GDPR, CCPA frameworks mapped to permitted use cases. Statutory liability, civil penalties, and ethical guidelines.</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        </div>
+        <div class="feature-title">People Search</div>
+        <div class="feature-desc">Full comparison of paid data brokers (BeenVerified, TruthFinder, Intelius, Instant Checkmate) plus free OSINT alternatives with workflow guides.</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+          </svg>
+        </div>
+        <div class="feature-title">Company Due Diligence</div>
+        <div class="feature-desc">OCCRP Aleph, OpenCorporates, Companies House, OpenSanctions — entity mapping, beneficial ownership, cross-border records.</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+        </div>
+        <div class="feature-title">Background Checks</div>
+        <div class="feature-desc">FCRA-compliant vs non-compliant tools mapped. Public records workflow including court, property, and death records.</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div class="feature-title">GitHub OSINT Toolboxes</div>
+        <div class="feature-desc">Curated review of open-source OSINT repositories — People-Search-OSINT, Coeus, Miessler skills — with comparison and use-case mapping.</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
+          </svg>
+        </div>
+        <div class="feature-title">AI Agent Automation</div>
+        <div class="feature-desc">LangGraph OSINT agents, DueDiligenceAI patterns, and skills.sh packaging — build a reproducible, audit-friendly pipeline.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section" id="cta">
+    <div class="container">
+      <div class="cta-inner">
+        <h2>Start Your Investigation</h2>
+        <p>Open the full OSINT intelligence report with detailed tool comparisons, step-by-step workflows, legal compliance tables, and an AI automation roadmap.</p>
+        <div class="cta-actions">
+          <a class="btn btn-white" href="osint-report.html">Read the Full Report</a>
+          <a class="btn btn-ghost-white" href="due-diligence.html">Operational Guide</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="brand" href="#top">
+          <div class="brand-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <div class="name">PI Due Diligence Hub</div>
+          </div>
+        </a>
+        <p>A practitioner's reference for PI-adjacent due diligence — OSINT tools, regulatory databases, court records, and automation pipelines.</p>
+      </div>
+
+      <div class="footer-col">
+        <h4>Reports</h4>
+        <ul>
+          <li><a href="osint-report.html">OSINT Intelligence Report</a></li>
+          <li><a href="due-diligence.html">Due Diligence Guide</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Key Resources</h4>
+        <ul>
+          <li><a href="https://adviserinfo.sec.gov" target="_blank" rel="noopener">IAPD / SEC Adviser Info</a></li>
+          <li><a href="https://brokercheck.finra.org" target="_blank" rel="noopener">FINRA BrokerCheck</a></li>
+          <li><a href="https://pcl.uscourts.gov" target="_blank" rel="noopener">PACER Case Locator</a></li>
+          <li><a href="https://aleph.occrp.org" target="_blank" rel="noopener">OCCRP Aleph</a></li>
+          <li><a href="https://opencorporates.com" target="_blank" rel="noopener">OpenCorporates</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© 2026 PI Due Diligence Hub. For informational purposes. Not legal advice.</span>
+      <span>Content generated April 2026 · <a href="https://github.com/jeromyjsmith/pi-due-diligence" target="_blank" rel="noopener">View on GitHub</a></span>
+    </div>
+  </div>
+</footer>
+
+<!-- ===== SCRIPTS ===== -->
+<script>
+  // Dark mode toggle
+  const toggle = document.getElementById('themeToggle');
+  const html   = document.documentElement;
+  const stored = localStorage.getItem('theme') || 'light';
+  html.dataset.theme = stored;
+  toggle.addEventListener('click', () => {
+    const next = html.dataset.theme === 'dark' ? 'light' : 'dark';
+    html.dataset.theme = next;
+    localStorage.setItem('theme', next);
+  });
+
+  // Active nav highlighting on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navLinks.forEach(a => a.style.color = '');
+        const link = document.querySelector(`.nav-links a[href="#${e.target.id}"]`);
+        if (link) link.style.color = 'var(--color-primary)';
+      }
+    });
+  }, { threshold: 0.35 });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

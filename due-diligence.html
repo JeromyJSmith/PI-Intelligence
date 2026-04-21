@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rigorous Due Diligence OSINT Report</title>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=zodiak@400,700&display=swap" rel="stylesheet">
+  <style>
+    :root,[data-theme="light"]{--text-xs:clamp(.75rem,.7rem + .25vw,.875rem);--text-sm:clamp(.875rem,.8rem + .35vw,1rem);--text-base:clamp(1rem,.95rem + .25vw,1.125rem);--text-lg:clamp(1.125rem,1rem + .75vw,1.5rem);--text-xl:clamp(1.5rem,1.2rem + 1.25vw,2.25rem);--text-2xl:clamp(2rem,1.2rem + 2.5vw,3.5rem);--space-1:.25rem;--space-2:.5rem;--space-3:.75rem;--space-4:1rem;--space-6:1.5rem;--space-8:2rem;--space-12:3rem;--space-16:4rem;--space-20:5rem;--radius-sm:.375rem;--radius-md:.5rem;--radius-lg:.75rem;--radius-xl:1rem;--color-bg:#f7f6f2;--color-surface:#f9f8f5;--color-surface-2:#fbfbf9;--color-surface-offset:#f3f0ec;--color-border:#d4d1ca;--color-divider:#dcd9d5;--color-text:#28251d;--color-text-muted:#66635d;--color-text-faint:#9a9892;--color-text-inverse:#f9f8f4;--color-primary:#01696f;--color-primary-hover:#0c4e54;--color-warning:#964219;--color-error:#a12c7b;--shadow-sm:0 1px 2px rgba(0,0,0,.06);--shadow-md:0 6px 18px rgba(0,0,0,.08);--content:1180px;--font-display:'Zodiak', Georgia, serif;--font-body:'Satoshi', Inter, sans-serif}
+    [data-theme="dark"]{--color-bg:#171614;--color-surface:#1c1b19;--color-surface-2:#201f1d;--color-surface-offset:#22211f;--color-border:#393836;--color-divider:#262523;--color-text:#e2e0db;--color-text-muted:#b0aea8;--color-text-faint:#86847e;--color-text-inverse:#2b2a28;--color-primary:#4f98a3;--color-primary-hover:#227f8b;--color-warning:#bb653b;--color-error:#d163a7;--shadow-sm:0 1px 2px rgba(0,0,0,.24);--shadow-md:0 8px 24px rgba(0,0,0,.34)}
+    *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;font-family:var(--font-body);font-size:var(--text-base);line-height:1.65;background:var(--color-bg);color:var(--color-text)} a{color:var(--color-primary)} a:hover{color:var(--color-primary-hover)} img,svg{max-width:100%;display:block} button{font:inherit} .container{width:min(calc(100% - 2rem),var(--content));margin-inline:auto} .skip{position:absolute;left:-9999px}.skip:focus{left:1rem;top:1rem;background:var(--color-surface);padding:.5rem 1rem;border-radius:.5rem;z-index:999}
+    header{position:sticky;top:0;z-index:20;background:color-mix(in srgb, var(--color-bg) 88%, transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--color-divider)}
+    .nav{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.9rem 0}.brand{display:flex;align-items:center;gap:.75rem;text-decoration:none;color:inherit}.brand svg{width:34px;height:34px}.brand-name{font-weight:700;letter-spacing:.02em}.navlinks{display:flex;gap:1rem;flex-wrap:wrap}.navlinks a{text-decoration:none;color:var(--color-text-muted);font-size:var(--text-sm)} .actions{display:flex;gap:.75rem;align-items:center}
+    .btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:.75rem 1rem;border-radius:999px;border:1px solid var(--color-border);background:var(--color-surface);color:var(--color-text);text-decoration:none;box-shadow:var(--shadow-sm)} .btn.primary{background:var(--color-primary);color:var(--color-text-inverse);border-color:transparent}.btn.ghost{background:transparent;box-shadow:none}
+    .hero{padding:clamp(3rem,8vw,7rem) 0 2rem}.hero-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:1.5rem;align-items:start}.eyebrow{font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.16em;color:var(--color-text-muted)} h1,h2,h3{font-family:var(--font-display);line-height:1.08;margin:0 0 .75rem} h1{font-size:var(--text-2xl);max-width:12ch} h2{font-size:var(--text-xl)} h3{font-size:var(--text-lg)} p{max-width:72ch;margin:.6rem 0 0}.lead{font-size:var(--text-lg);color:var(--color-text-muted)}
+    .card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);padding:1rem;box-shadow:var(--shadow-sm)} .stack{display:grid;gap:1rem} .hero-panel{background:linear-gradient(180deg,var(--color-surface),var(--color-surface-offset));border:1px solid var(--color-border);border-radius:1.25rem;padding:1rem;box-shadow:var(--shadow-md)} .stat{display:flex;justify-content:space-between;gap:1rem;padding:.8rem 0;border-bottom:1px solid var(--color-divider)} .stat:last-child{border-bottom:none}
+    main section{padding:2rem 0} .grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem} .grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem} .muted{color:var(--color-text-muted)} .tiny{font-size:var(--text-xs);color:var(--color-text-muted)}
+    table{width:100%;border-collapse:collapse;background:var(--color-surface);border:1px solid var(--color-border);border-radius:1rem;overflow:hidden;display:block} thead,tbody,tr{display:table;width:100%;table-layout:fixed} th,td{padding:.85rem;border-bottom:1px solid var(--color-divider);text-align:left;vertical-align:top} th{font-size:var(--text-sm);color:var(--color-text-muted);background:var(--color-surface-offset)}
+    .pill{display:inline-block;padding:.3rem .65rem;border-radius:999px;background:color-mix(in srgb, var(--color-primary) 12%, var(--color-surface));color:var(--color-primary);font-size:var(--text-xs);font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+    .checklist li,.toc li{margin:.5rem 0}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.field{display:grid;gap:.4rem}.field label{font-size:var(--text-sm);font-weight:700}.field input,.field textarea,.field select{width:100%;min-height:44px;border-radius:.75rem;border:1px solid var(--color-border);background:var(--color-surface-2);padding:.85rem;color:var(--color-text)} .field textarea{min-height:130px;resize:vertical}
+    .callout{border-left:3px solid var(--color-primary);padding:1rem 1rem 1rem .9rem;background:var(--color-surface-offset);border-radius:.75rem}.footer{padding:2rem 0 4rem;color:var(--color-text-muted)} code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em;background:var(--color-surface-offset);padding:.1rem .35rem;border-radius:.35rem}
+    @media (max-width: 900px){.hero-grid,.grid-2,.grid-3,.form-grid{grid-template-columns:1fr}.nav{align-items:flex-start;flex-direction:column}.actions{width:100%;justify-content:space-between}.navlinks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%}}
+  </style>
+</head>
+<body>
+<!-- ===== SITE NAV BAR ===== -->
+<div style="background:#01696F;color:white;padding:8px 20px;display:flex;align-items:center;justify-content:space-between;gap:1rem;font-family:'Satoshi',-apple-system,'Segoe UI',Arial,sans-serif;font-size:0.82rem;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.15);">
+  <a href="index.html" style="color:white;text-decoration:none;display:flex;align-items:center;gap:6px;font-weight:600;opacity:0.95;transition:opacity .15s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.95">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+    PI Due Diligence Hub
+  </a>
+  <div style="display:flex;align-items:center;gap:12px;opacity:0.8;font-size:0.75rem;">
+    <span>Due Diligence Guide</span>
+    <span style="opacity:0.5;">·</span>
+    <a href="osint-report.html" style="color:white;text-decoration:none;opacity:0.85;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.85">OSINT Report →</a>
+  </div>
+</div>
+<a class="skip" href="#content">Skip to content</a>
+<header>
+  <div class="container nav">
+    <a class="brand" href="#top" aria-label="Rigorous Due Diligence OSINT Report home">
+      <svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><rect x="8" y="8" width="48" height="48" rx="14" stroke="currentColor" stroke-width="4"/><path d="M21 35l8 8 15-20" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div><div class="brand-name">Rigorous Due Diligence</div><div class="tiny">OSINT report, workflow, intake, automation</div></div>
+    </a>
+    <nav class="navlinks" aria-label="Primary">
+      <a href="#resources">Resources</a>
+      <a href="#pipeline">Pipeline</a>
+      <a href="#automation">Automation</a>
+      <a href="#open-source">Open source</a>
+      <a href="#skills">Skills</a>
+      <a href="#intake">Intake page</a>
+      <a href="#appendix">Appendix</a>
+    </nav>
+    <div class="actions">
+      <button class="btn ghost" type="button" data-theme-toggle aria-label="Switch theme">◐</button>
+      <a class="btn primary" href="#intake">Start intake</a>
+    </div>
+  </div>
+</header>
+
+<main id="content">
+  <section class="hero container" id="top">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow">Multi-page style single-file guide</div>
+        <h1>Build a PI-adjacent due diligence pipeline for counterparties, managers, and known associates.</h1>
+        <p class="lead">This report combines regulatory checks, court searches, alias expansion, associate mapping, and repeatable automation into one operational playbook.[web:1][web:2][web:3][web:5][web:9][web:16][web:18][web:21][web:28]</p>
+        <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:1rem">
+          <a class="btn primary" href="#pipeline">Read the pipeline</a>
+          <a class="btn" href="#open-source">Browse open-source stack</a>
+        </div>
+      </div>
+      <aside class="hero-panel" aria-label="What this report covers">
+        <span class="pill">Scope</span>
+        <div class="stat"><strong>Regulatory</strong><span class="muted">IAPD, SEC actions, FINRA, disclosures</span></div>
+        <div class="stat"><strong>Courts</strong><span class="muted">PACER and supporting public record checks</span></div>
+        <div class="stat"><strong>OSINT</strong><span class="muted">Aliases, associates, entity links, social traces</span></div>
+        <div class="stat"><strong>Automation</strong><span class="muted">Case management, intake, agent skills, GitHub stack</span></div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="container" id="overview">
+    <div class="grid-2">
+      <div class="card">
+        <h2>Use case</h2>
+        <p>For an individual investor or operator, the closest practical substitute for a private investigator is a layered workflow: official regulator databases first, federal court search second, paid background and people-search tools third, and OSINT expansion for aliases, entities, and known associates last.[web:1][web:2][web:3][web:5][web:6][web:7][web:9][web:16][web:20]</p>
+      </div>
+      <div class="card">
+        <h2>Operating principle</h2>
+        <p>No single database is enough. The strongest workflow cross-checks each claim across at least two independent source types, such as regulator filings plus PACER, or a people-search hit plus entity records and public web evidence.[web:2][web:5][web:6][web:9][web:16][web:18][web:27]</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="container" id="resources">
+    <h2>Priority resources</h2>
+    <table aria-label="Priority resources table">
+      <thead><tr><th>Category</th><th>Resource</th><th>Why it matters</th><th>Use in pipeline</th></tr></thead>
+      <tbody>
+        <tr><td>Adviser checks</td><td>IAPD / adviserinfo.sec.gov [web:2]</td><td>Public disclosure system for investment advisers and firms.[web:2][web:4]</td><td>Confirm registration, disclosures, history, and firm identity.[web:2][web:4]</td></tr>
+        <tr><td>Enforcement</td><td>SEC Action Lookup and SEC litigation releases [web:1][web:3]</td><td>Find individuals subject to SEC actions and related litigation history.[web:1][web:3]</td><td>Check for enforcement red flags before deeper work.[web:1][web:3]</td></tr>
+        <tr><td>Broker history</td><td>FINRA disclosure framework [web:5]</td><td>Regulatory reporting includes events such as bankruptcies, judgments, liens, and complaints in the broker context.[web:5]</td><td>Use whenever a target has broker-dealer exposure or dual registration.[web:5]</td></tr>
+        <tr><td>Federal litigation</td><td>PACER Case Locator [web:6][web:9]</td><td>Nationwide index for district, bankruptcy, and appellate federal courts.[web:6][web:9]</td><td>Search civil cases, bankruptcies, and linked entities.[web:6][web:9]</td></tr>
+        <tr><td>People search</td><td>OSINT people-search lists and commercial aggregators [web:7][web:16][web:20]</td><td>Useful for aliases, addresses, phone numbers, relatives, and possible associates, though not authoritative by themselves.[web:7][web:16][web:20]</td><td>Use as lead generation, not final proof.[web:7][web:16][web:20]</td></tr>
+        <tr><td>AI investigation patterns</td><td>Miessler investigation skills and LangGraph-style OSINT agents [web:18][web:21][web:27]</td><td>Offer reusable structures for person lookup, company intel, and due diligence workflows.[web:18][web:21][web:27]</td><td>Adapt these for automation and standardized agent behaviors.[web:18][web:21][web:27]</td></tr>
+        <tr><td>Skills ecosystem</td><td>skills.sh / GitHub skills ecosystem [web:22][web:28]</td><td>Defines portable agent skills and version-aware installation workflows.[web:22][web:28]</td><td>Package repeatable tasks as skills and pin versions for auditability.[web:22][web:28]</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="container" id="pipeline">
+    <h2>Rigorous pipeline</h2>
+    <div class="grid-3">
+      <article class="card"><span class="pill">1. Intake</span><h3>Collect canonical identifiers</h3><p>Capture full legal name, middle names, prior names, DOB, city-state history, firms, websites, emails, phones, and any known entities or trusts. Without canonical identifiers, later alias and court work produces too many false positives.[web:6][web:9][web:16]</p></article>
+      <article class="card"><span class="pill">2. Regulator pass</span><h3>Check official regulated footprints</h3><p>Run adviser, broker, and SEC enforcement checks first because they are high-signal, public, and structured. Record exact names, CRD-style identifiers if present, dates, and disclosure language.[web:1][web:2][web:3][web:5]</p></article>
+      <article class="card"><span class="pill">3. Court pass</span><h3>Search cases and bankruptcies</h3><p>Use PACER Case Locator for federal civil, appellate, and bankruptcy cases, then review dockets for anything material rather than relying on hit counts alone.[web:6][web:9]</p></article>
+      <article class="card"><span class="pill">4. Alias expansion</span><h3>Enumerate names and handles</h3><p>Expand maiden names, shortened first names, middle-initial variants, prior addresses, business aliases, domains, and usernames using people-search leads and open web traces.[web:7][web:16][web:20]</p></article>
+      <article class="card"><span class="pill">5. Associate mapping</span><h3>Check the network</h3><p>Known associates matter because repeat co-founders, officers, relatives, and shell entities often surface patterns not visible on the primary subject alone. Query the same court and regulator pipeline on the closest connected names and entities.[web:6][web:9][web:16][web:18]</p></article>
+      <article class="card"><span class="pill">6. Adjudication</span><h3>Score and escalate</h3><p>Classify each finding as verified, probable, unverified, or false positive. Escalate high-severity hits such as SEC actions, repeated fraud allegations, or recent bankruptcies for manual review.[web:1][web:3][web:5][web:9]</p></article>
+    </div>
+  </section>
+
+  <section class="container" id="doublecheck">
+    <h2>Double-check rules</h2>
+    <div class="callout"><strong>Rule:</strong> never close a file on one source type. A lawsuit found in a people-search tool should be verified in PACER or another court source; a claimed registration should be verified in IAPD or the relevant regulator system.[web:2][web:5][web:6][web:9][web:16]</div>
+    <ul class="checklist">
+      <li>Match on at least two identifiers whenever a name is common: name plus city, DOB range, employer, or prior address.[web:6][web:9][web:16]</li>
+      <li>Store screenshots, URLs, docket numbers, and access dates for every substantive hit so the file is reproducible.[web:1][web:2][web:3][web:9]</li>
+      <li>Differentiate allegations from findings. A complaint is not the same as a judgment, settlement, injunction, or bar.[web:1][web:3][web:9]</li>
+      <li>Track whether the event belongs to the individual, an associate, or an entity they controlled.[web:6][web:9][web:18]</li>
+    </ul>
+  </section>
+
+  <section class="container" id="automation">
+    <h2>Automation blueprint</h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3>What to automate first</h3>
+        <ul class="checklist">
+          <li>Intake normalization into a structured case record with target, aliases, addresses, phones, emails, entities, and associates.</li>
+          <li>Launch links and query templates for IAPD, SEC, PACER, and selected people-search tools.[web:1][web:2][web:3][web:9]</li>
+          <li>Evidence logging with severity tags, confidence scores, source type, and analyst notes.[web:18][web:27]</li>
+          <li>Associate expansion rules that automatically create follow-on tasks for spouse, co-founder, manager, GP, managing member, and registered agent names.[web:16][web:18][web:20]</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Suggested architecture</h3>
+        <p>Build a case-centric web app that stores one JSON record per target, with tabs for intake, sources, findings, associates, and decision memo. Use agent skills for repeatable subtasks and pin skill versions using GitHub's emerging skills tooling so behavior changes are traceable.[web:22][web:28]</p>
+        <p class="muted">A practical flow is: intake form → query launcher → evidence capture → review queue → final report packet.[web:18][web:21][web:27]</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="container" id="open-source">
+    <h2>Open-source projects and patterns</h2>
+    <table aria-label="Open source and patterns">
+      <thead><tr><th>Project / pattern</th><th>What it offers</th><th>How to use it</th></tr></thead>
+      <tbody>
+        <tr><td>People-Search-OSINT [web:16]</td><td>Curated catalog of people-search and public record resources oriented toward OSINT workflows.[web:16]</td><td>Use as a directory for discovery and fallback source selection.</td></tr>
+        <tr><td>Coeus OSINT People Search list [web:20]</td><td>Another curated set of fee and public tools for people, records, and contact discovery.[web:20]</td><td>Cross-reference providers and build launch templates for each source.</td></tr>
+        <tr><td>Miessler Personal AI Infrastructure investigation skills [web:18][web:27]</td><td>Reusable investigation skill structure for people lookup, company intel, and due diligence.[web:18][web:27]</td><td>Borrow the skill decomposition model for your own internal agent library.</td></tr>
+        <tr><td>OSINT AI Agent with LangGraph [web:21]</td><td>Demonstrates a multi-agent reconnaissance framework using specialized agent roles.[web:21]</td><td>Use as reference for orchestration, role separation, and tool chaining.</td></tr>
+        <tr><td>DueDiligenceAI [web:24]</td><td>Illustrates a multi-agent company investigation workflow, though aimed at company research rather than regulated-person diligence.[web:24]</td><td>Adapt the pattern for human and entity due-diligence cases.</td></tr>
+        <tr><td>skills ecosystem / gh skill [web:22][web:28]</td><td>Portable agent skill packaging and management with version-aware installation and updates.[web:22][web:28]</td><td>Package your investigation tasks as skills, then pin and update safely.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="container" id="skills">
+    <h2>Valuable skills to package</h2>
+    <div class="grid-3">
+      <article class="card"><h3>Subject intake skill</h3><p>Normalizes names, DOB, addresses, entity links, and source consent boundaries into a single schema. This is the foundation skill for all downstream automation.</p></article>
+      <article class="card"><h3>Regulatory lookup skill</h3><p>Queries adviser, SEC, and broker disclosure systems and returns structured disclosures, identifiers, and enforcement history.[web:1][web:2][web:3][web:5]</p></article>
+      <article class="card"><h3>Court lookup skill</h3><p>Generates PACER search plans, logs case numbers, and classifies case types such as civil, bankruptcy, or appeal.[web:6][web:9]</p></article>
+      <article class="card"><h3>Alias expansion skill</h3><p>Produces candidate name variants, usernames, domains, and linked entities using public web and people-search leads.[web:7][web:16][web:20]</p></article>
+      <article class="card"><h3>Associate mapping skill</h3><p>Builds a first-degree network of relatives, partners, officers, registered agents, and recurring co-defendants or co-managers.[web:16][web:18][web:27]</p></article>
+      <article class="card"><h3>Evidence adjudication skill</h3><p>Assigns severity, confidence, source type, and next action, and produces a final memo with an audit trail.</p></article>
+    </div>
+    <p class="muted">skills.sh positions agent skills as reusable capability packages, while GitHub's recent skills tooling emphasizes versioning and content-aware change detection, which is especially useful when the workflow itself must remain auditable.[web:22][web:28]</p>
+  </section>
+
+  <section class="container" id="intake">
+    <h2>Case intake page</h2>
+    <p>This page is designed to gather the minimum viable facts needed to launch the pipeline with low ambiguity and immediate follow-on tasks.</p>
+    <form class="card" onsubmit="event.preventDefault(); exportCase();" aria-label="Due diligence intake form">
+      <div class="form-grid">
+        <div class="field"><label for="full_name">Full legal name</label><input id="full_name" required placeholder="Chris Example" /></div>
+        <div class="field"><label for="dob">Date of birth or range</label><input id="dob" placeholder="YYYY-MM-DD or approximate" /></div>
+        <div class="field"><label for="aliases">Known aliases / prior names</label><input id="aliases" placeholder="Middle names, maiden names, nicknames" /></div>
+        <div class="field"><label for="locations">City / state history</label><input id="locations" placeholder="Boulder, Denver, Miami..." /></div>
+        <div class="field"><label for="phones">Phones</label><input id="phones" placeholder="Known or prior numbers" /></div>
+        <div class="field"><label for="emails">Emails / domains</label><input id="emails" placeholder="Addresses and company domains" /></div>
+        <div class="field"><label for="firms">Current and prior firms</label><input id="firms" placeholder="Firm names, GP/LLC names, trusts" /></div>
+        <div class="field"><label for="websites">Websites / LinkedIn / profiles</label><input id="websites" placeholder="URLs or handles" /></div>
+      </div>
+      <div class="field" style="margin-top:1rem"><label for="associates">Known associates</label><textarea id="associates" placeholder="Partners, spouse, co-founders, operating members, assistants, registered agents"></textarea></div>
+      <div class="field" style="margin-top:1rem"><label for="scope">Scope / reason for diligence</label><textarea id="scope" placeholder="What role does this person or firm play, what funds are involved, and what specific risks matter most?"></textarea></div>
+      <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:1rem">
+        <button class="btn primary" type="submit">Export case JSON</button>
+        <button class="btn" type="button" onclick="prefillExample()">Load example</button>
+      </div>
+      <p class="tiny">The export creates a local JSON file for case transfer into your automation stack. It does not persist data in browser storage.</p>
+    </form>
+  </section>
+
+  <section class="container" id="signup">
+    <h2>Signup and operator checklist</h2>
+    <ul class="checklist">
+      <li>Create accounts for PACER and any chosen screening vendors before the first live case so analysts are not blocked mid-stream.[web:6][web:9][web:13]</li>
+      <li>Maintain a controlled source list with owner, cost, login method, geographic coverage, and evidentiary value.</li>
+      <li>Decide which sources are lead-generation only versus sources that count as verification evidence.[web:7][web:16][web:20]</li>
+      <li>Write a one-page policy covering consent, permissible use, privacy boundaries, and escalation for adverse findings.</li>
+    </ul>
+  </section>
+
+  <section class="container" id="appendix">
+    <h2>Implementation notes</h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Recommended schema</h3>
+        <p>Use a case object with keys for <code>subject</code>, <code>aliases</code>, <code>identifiers</code>, <code>entities</code>, <code>associates</code>, <code>sources</code>, <code>findings</code>, and <code>decision</code>. This keeps the workflow compatible with skill-based agents and Git-backed versioning.[web:22][web:28]</p>
+      </div>
+      <div class="card">
+        <h3>Evidence taxonomy</h3>
+        <p>Suggested severity levels are informational, caution, elevated, and critical. Suggested confidence levels are verified, corroborated, probable, and unverified.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="container footer">
+  <p>Prepared as a practical due-diligence report and intake tool using public regulator, court, OSINT, agent-skill, and GitHub ecosystem references.[web:1][web:2][web:3][web:5][web:6][web:9][web:16][web:18][web:21][web:22][web:24][web:27][web:28]</p>
+</footer>
+
+<script>
+(function(){
+  const btn=document.querySelector('[data-theme-toggle]');
+  const root=document.documentElement;
+  let theme=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+  root.setAttribute('data-theme',theme);
+  btn.addEventListener('click',()=>{theme=theme==='dark'?'light':'dark';root.setAttribute('data-theme',theme);});
+})();
+function prefillExample(){
+  document.getElementById('full_name').value='Chris Example';
+  document.getElementById('dob').value='Approx. 1978-1983';
+  document.getElementById('aliases').value='Christopher Example; C. Example';
+  document.getElementById('locations').value='Boulder, CO; Miami, FL; New York, NY';
+  document.getElementById('phones').value='+1-555-0100';
+  document.getElementById('emails').value='ce@example.com; examplecapital.com';
+  document.getElementById('firms').value='Example Capital LLC; Example GP LP';
+  document.getElementById('websites').value='https://example.com ; linkedin.com/in/example';
+  document.getElementById('associates').value='Pat Example, Dana Example, Example Registered Agent LLC';
+  document.getElementById('scope').value='Investment manager due diligence before wire transfer. Need lawsuits, bankruptcies, SEC actions, aliases, known associates, and entity history.';
+}
+function exportCase(){
+  const data={
+    subject:{full_name:v('full_name'),dob:v('dob')},
+    aliases:splitVals('aliases'),
+    identifiers:{locations:splitVals('locations'),phones:splitVals('phones'),emails:splitVals('emails')},
+    entities:splitVals('firms'),
+    profiles:splitVals('websites'),
+    associates:splitVals('associates'),
+    scope:v('scope'),
+    created_at:new Date().toISOString()
+  };
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=(data.subject.full_name||'case').toLowerCase().replace(/[^a-z0-9]+/g,'-')+'-intake.json';
+  document.body.appendChild(a); a.click(); a.remove();
+}
+function v(id){return document.getElementById(id).value.trim()}
+function splitVals(id){return v(id).split(/[;,\n]+/).map(s=>s.trim()).filter(Boolean)}
+</script>
+</body>
+</html>
