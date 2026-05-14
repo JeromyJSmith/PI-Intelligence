@@ -2,7 +2,7 @@
 
 A practitioner's resource hub for PI-adjacent due diligence — OSINT tools, people search platforms, regulatory databases, federal court records, and automation pipelines.
 
-**Live site:** https://jeromyjsmith.github.io/pi-due-diligence/
+**Live site:** https://jeromyjsmith.github.io/PI-Intelligence/
 
 ## Pages
 
