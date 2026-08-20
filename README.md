@@ -18,6 +18,7 @@ A practitioner's resource hub for PI-adjacent due diligence — OSINT tools, peo
 - Federal courts: PACER Case Locator
 - Regulatory: IAPD, SEC enforcement, FINRA BrokerCheck
 - AI-powered OSINT agents and GitHub toolboxes
+- Username and email enumeration: Sherlock, Maigret, WhatsMyName, and Holehe
 - Automation roadmap and skills.sh packaging
 
 ## Deployment
