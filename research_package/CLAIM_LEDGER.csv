@@ -1,0 +1,20 @@
+id,claim,classification,source_or_location,what_is_established,what_remains_unproven
+C01,HTML is approved to wire,Contradicted,institutional_diligence_explorer.html lines 106-199; JS 654+,Green state is hard-coded and count-driven,No evidence package or approval authority
+C02,CIK 0002101619 is Outpost Ventures Energy LP,Verified limited,SEC submissions JSON,Issuer identity/address/Form D date,Capital raised/custody/audit/returns
+C03,CIK 0001864022 is Harden Fund I,Contradicted,SEC filing index 0001864022-24-000001,Unrelated Outpost Ventures LP filing identity,Link to Harden
+C04,ScaleWolf has Lithuanian permission,Partially supported,Bank of Lithuania permission 2209,Permission exists for informed-investor CIU law,Exact scope/order claimed in HTML
+C05,Harden credentials,Supported,USAFA/Air & Space Forces Association,Identity and career anchors,Fund economics
+C06,$100M+ LP subscriptions,Unsupported,Reports and sponsor claims,Claim is published,Subscriptions/calls/cash reconciliation
+C07,$100M+ deployed,Self-reported,Reports/HTML,Promotional figure exists,Direct fund equity and audited performance
+C08,$480M-$580M capture,Partially supported,Outpost/USAFA bios,Aggregate claims exist,Company-level award ledger and attribution
+C09,$5B+ follow-on,Self-reported,Outpost/biographies,Aggregate claim exists,Methodology and realized capital
+C10,$1 creates $2-$4 match,Unsupported,HTML/report narrative,Marketing scenario,Automaticity or portfolio-level awards
+C11,IRS ceiling $7.72M and $2.47M obligation,Partially supported,USAspending/HigherGov citations,Event and approximate amounts,Authoritative modification/settlement
+C12,IRS T4C due budget shifts,Unsupported,HTML gate 6,Termination label asserted,Cause/payment/deliverables/CPARS
+C13,Annual GAAP/GIPS audit covenant,Inaccessible,HTML gate 2,Only assertion,Executed LPA and audit
+C14,ERA confirmed by Form D,Contradicted,HTML gate 5,Form D exists,ADV/ERA filing and eligibility
+C15,Independent administrator and fee offset,Inaccessible,HTML gates 4 and 8,Only assertions,Engagement/LPA terms
+C16,CFIUS/ITAR firewall,Unsupported,HTML gate 7,Only assertion,Opinion/program/data-flow proof
+C17,Three references confirmed,Unsupported,HTML gate 10,Only assertion,Named call receipts
+C18,Bio defect remediated,Contradicted,HTML gate 9 vs report inspection,HTML says remediated,Independent dated capture/policy
+C19,No adverse record,Scoped not-found,Report adverse-record section,No identity-matched result in pass,Professional multi-jurisdiction search
